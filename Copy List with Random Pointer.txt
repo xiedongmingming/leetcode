@@ -1,0 +1,94 @@
+Copy List with Random Pointer
+
+A linked list is given such that each node contains an additional random pointer which could point to any node in the list or null. Return a deep copy of the list. 
+
+/**
+ * Definition for singly-linked list with a random pointer.
+ * class RandomListNode{
+ *     int label;
+ *     RandomListNode next, random;
+ *     RandomListNode(int x){ this.label = x; }
+ * };
+ */
+public class Solution{
+    public RandomListNode copyRandomList(RandomListNode head){
+         
+    }
+}
+public static RandomListNode copyRandomList(RandomListNode head){
+	RandomListNode newhead = null;
+	if(head == null){
+		return newhead;
+	}else{
+		newhead = new RandomListNode(head.label);
+	}
+	HashMap<RandomListNode, RandomListNode> map = new HashMap<RandomListNode, RandomListNode>();
+	map.put(head, newhead);
+	RandomListNode oldcurrentpoint = head;
+	RandomListNode newcurrentpoint = newhead;
+	while(oldcurrentpoint != null){//对当前节点的next和random进行处理(当前节点已经创建并加入到Map中了)
+		if(oldcurrentpoint.next != null){
+			if(!map.containsKey(oldcurrentpoint.next)){//不包含
+				newcurrentpoint.next = new RandomListNode(oldcurrentpoint.next.label);
+				map.put(oldcurrentpoint.next, newcurrentpoint.next);
+			}else{
+				newcurrentpoint.next = map.get(oldcurrentpoint.next);
+			}
+			if(oldcurrentpoint.random != null && !map.containsKey(oldcurrentpoint.random)){
+				newcurrentpoint.random = new RandomListNode(oldcurrentpoint.random.label);
+				map.put(oldcurrentpoint.random, newcurrentpoint.random);
+			}else if(oldcurrentpoint.random != null && map.containsKey(oldcurrentpoint.random)){
+				newcurrentpoint.random = map.get(oldcurrentpoint.random);
+			}
+			oldcurrentpoint = oldcurrentpoint.next;
+			newcurrentpoint = newcurrentpoint.next;
+		}else{//表示最后一个节点
+			if(oldcurrentpoint.random != null && !map.containsKey(oldcurrentpoint.random)){
+				newcurrentpoint.random = new RandomListNode(oldcurrentpoint.random.label);
+				map.put(oldcurrentpoint.random, newcurrentpoint.random);
+			}else if(oldcurrentpoint.random != null && map.containsKey(oldcurrentpoint.random)){
+				newcurrentpoint.random = map.get(oldcurrentpoint.random);
+			}
+			oldcurrentpoint = oldcurrentpoint.next;
+			newcurrentpoint = null;
+		}
+	}
+	return newhead;
+}
+
+
+public RandomListNode copyRandomList(RandomListNode head){
+	if(head == null){
+		return null;
+	}
+	RandomListNode node = head;
+	RandomListNode temp = null;
+	while(node != null){//insert new node
+		temp = node.next;
+		RandomListNode newNode = new RandomListNode(node.label);
+		node.next = newNode;
+		newNode.next = temp;
+		node = temp;
+	}
+	node = head;
+	while(node != null){//update new node's random
+		if(node.random != null){
+			node.next.random = node.random.next;
+		}
+		node = node.next.next;
+	}
+	RandomListNode newHead = head.next;
+	node = head;
+	RandomListNode newNode = node.next;
+	while(node != null){
+		node.next = newNode.next;
+		if(newNode.next != null){
+			newNode.next = newNode.next.next;
+		}
+		node = node.next;
+		if(node != null){
+			newNode = node.next;
+		}
+	}
+	return newHead;
+}

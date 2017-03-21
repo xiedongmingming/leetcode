@@ -1,0 +1,78 @@
+Combination Sum
+
+Given a set of candidate numbers (C) and a target number (T), find all unique combinations in C where the candidate numbers sums to T. The same repeated number may be chosen from C unlimited number of times. 
+Note:
+All numbers (including target) will be positive integers.
+Elements in a combination (a1, a2, … , ak) must be in non-descending order. (ie, a1 ≤ a2 ≤ … ≤ ak).
+The solution set must not contain duplicate combinations.
+For example, given candidate set 2,3,6,7 and target 7, 
+A solution set is: 
+[7] 
+[2, 2, 3] 
+
+public class Solution{
+    public List<List<Integer>> combinationSum(int[] candidates, int target){
+        
+    }
+}
+
+My first attempt: (the code is wrong). 
+public class Solution{
+    public ArrayList<ArrayList<Integer>> combinationSum(int[] candidates, int target) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+        Arrays.sort(candidates);
+        ArrayList<Integer> item = new ArrayList<Integer>();
+        dfs(candidates, item, target, result);
+        return result;
+    }
+    public void dfs(int[] candidates, ArrayList<Integer> item, int target, ArrayList<ArrayList<Integer>> result){
+        if(target == 0){
+            result.add(new ArrayList<Integer>(item));
+        }
+        for(int i = 0; i < candidates.length; i++){
+            item.add(candidates[i]);
+            dfs(candidates, item, target-candidates[i], result);
+            item.remove(item.size()-1);
+        }
+    }
+}
+Correct Solution: 
+Time: O(n!), Space: O(n)
+public class Solution {
+    public ArrayList<ArrayList<Integer>> combinationSum(int[] candidates, int target) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+        Arrays.sort(candidates);
+        ArrayList<Integer> item = new ArrayList<Integer>();
+        dfs(candidates, 0, item, target, result);
+        return result;
+    }
+    public void dfs(int[] candidates, int start, ArrayList<Integer> item, int target, ArrayList<ArrayList<Integer>> result){
+        if(target == 0){
+            result.add(new ArrayList<Integer>(item));
+        }
+        for(int i = start; i < candidates.length; i++){
+            if(target < candidates[i]) return;
+            if(i > 0 && candidates[i] == candidates[i-1]) continue;//因为每个数本身就可以重复取，所以数组里的相同数可以跳过。
+            item.add(candidates[i]);
+            dfs(candidates, i, item, target-candidates[i], result);//dfs里的参数还是i,而不是i+1是因为每个数可以重复取。
+            item.remove(item.size()-1);
+        }
+    }
+}
+
+I think adding this line can cut off paths in dfs search. 
+if(target < candidates[i]) return;
+But if we don't have this line, we need to check if(target < 0):
+public void dfs(int[] candidates, int start, ArrayList<Integer> item, int target, ArrayList<ArrayList<Integer>> result){
+	if(target < 0) return;
+	if(target == 0){
+		result.add(new ArrayList<Integer>(item));
+	}
+	for(int i = start; i < candidates.length; i++){
+		//if(target < candidates[i]) return;
+		if(i > 0 && candidates[i] == candidates[i-1]) continue;
+		item.add(candidates[i]);
+		dfs(candidates, i, item, target-candidates[i], result);
+		item.remove(item.size()-1);
+	}
+}

@@ -1,0 +1,56 @@
+Best Time to Buy and Sell Stock II
+ 
+Say you have an array for which the ith element is the price of a given stock on day i. Design an algorithm to find the maximum profit. You may complete as many transactions as you like (ie, buy one and sell one share of the stock multiple times). However, you may not engage in multiple transactions at the same time (ie, you must sell the stock before you buy again).
+
+public class Solution{
+    public int maxProfit(int[] prices){
+        
+    }
+}
+如果在现实中我们也可以知道以后几天的股票价格,那我们肯定稳赚不赔咯.考虑如果是我们在炒股,那么我们在某天买入股票的时候,如果明天比今天价格高,那么卖给明天是赚的,如果后天更高,那肯定会想等到后天,也就是会一直等到连续的最高的那一天,而反过来想,每天都卖其实跟等到那天卖是一样的,对吧,只要今天比昨天价格高,那就昨天买,今天卖,反正又不要手续费.题目说明可以多次买卖,但是同一时间只能有一股在手里.这样就可以在每次上升子序列之前买入,在上升子序列结束的时候卖出.相当于能够获得所有的上升子序列的收益.而且,对于一个上升子序列,比如:5,1,2,3,4,0中的1,2,3,4序列来说,对于两种操作方案:
+一 在1买入,4卖出;
+二 在1买入,2卖出同时买入,3卖出同时买入,4卖出;
+这两种操作下,收益是一样的.所以算法就是,从头到尾扫描prices,如果i比i-1大,那么price[i]–price[i-1]就可以计入最后的收益中.这样扫描一次O(n)就可以获得最大收益了. 
+题解:简单的方法就是一旦第二天的价格比前一天的高,就在前一天买入第二天卖出.代码如下:
+public int maxProfit(int[] prices){
+    int total = 0;
+    for(int i = 1; i< prices.length; i++){
+        if(prices[i] > prices[i - 1]){ 
+            int profit = prices[i] - prices[i - 1];
+            total += profit;
+        }
+    }
+    return total;
+}
+但是这个会违反"不能同一天买卖的规则",例如3天的价格分别为1,2,3那么按上述算法就会在2那天同一天买卖了.正确的做法是:第1天买第3天卖.虽然两种方法数字结果是对的,但是逻辑不一样.不过虽然这么说,这道题的本事仍然是让你找最大利润,并没有让你明确哪天买哪天卖.所以对面试官你仍然可以说,这种方法只是帮助我找到最大利润,我并没有说是要在同一天买卖,只是计算:所有第二天比前一天大的差值的合,我是为了找最大利润而已(画个趋势图讲解一下就行了..).不过如果不是那样略有点投机取巧的话,干嘛非要每一次有一点点增长就加总和,带来不必要的解释麻烦?何不先找到递减的局部最低点,再找到递增的局部最高点,算一次加和,然后再这么找?这样就能保证买卖不会在同一天了..代码如下:
+public static int maxProfit(int[] prices){
+	int len = prices.length;
+	if(len <= 1){
+		return 0;
+	}
+	int i = 0;
+	int total = 0;
+	while(i < len - 1){
+		int buy, sell;
+		while(i + 1 < len && prices[i + 1] < prices[i]){
+			i++;//寻找递减区间的最后一个值(局部最小点)
+		}
+		buy = i;//局部最小点作为买入点
+		i++;//找下一个点(卖出点至少为下一个点)
+		while(i < len && prices[i] >= prices[i - 1]){
+			i++;//不满足继续往下找递增区间的最后一个值(局部最高点)
+		}
+		sell = i - 1;//设置卖出点
+		total += prices[sell] - prices[buy];//计算总和
+	}
+	return total;
+}
+ 
+
+
+
+
+
+
+
+

@@ -1,0 +1,78 @@
+Convert Sorted List to Binary Search Tree
+
+Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
+
+每次取链表的中点作为root，然后递归
+
+
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; next = null; }
+ * }
+ */
+/**
+ * Definition for binary tree
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public TreeNode sortedListToBST(ListNode head) {
+        if (head == null) return null;
+        if (head.next == null)
+            return new TreeNode(head.val);
+        //p为链表中点，从p处截断，右半头节点为q
+        ListNode p = getMid(head);
+        ListNode q = p.next;
+        p.next = null;
+        TreeNode root = new TreeNode(p.val);
+        //删除p 新建一个虚拟的节点r r.next是左半段的头节点
+        ListNode r = new ListNode(0);
+        r.next = head;
+        ListNode s = r;
+        while (true) {
+            if (s.next == p)
+                break;
+            s = s.next;
+        }
+        s.next = null;
+        //递归
+        root.left = sortedListToBST(r.next);
+        root.right = sortedListToBST(q);
+        return root;
+    }
+    
+    public ListNode getMid(ListNode head) {
+        if (head == null || head.next == null)
+            return head;
+        ListNode p = head;
+        ListNode q = head;
+        while (p.next != null && q.next != null && 
+        q.next.next != null) {
+            p = p.next;
+            q = q.next.next;
+        }
+        return p;
+    }
+}
+
+
+
+
+
+
+    
+
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+Combination Sum II
+
+
+Given a collection of candidate numbers (C) and a target number (T), find all unique combinations in C where the candidate numbers sums to T. 
+
+Each number in C may only be used once in the combination. 
+
+Note:
+
+
+?All numbers (including target) will be positive integers.
+?Elements in a combination (a1, a2, ¡­ , ak) must be in non-descending order. (ie, a1 ¡Ü a2 ¡Ü ¡­ ¡Ü ak).
+?The solution set must not contain duplicate combinations.
+
+For example, given candidate set 10,1,2,7,6,1,5 and target 8, 
+A solution set is: 
+[1, 7] 
+[1, 2, 5] 
+[2, 6] 
+[1, 1, 6] 
+
+
+public class Solution {
+    public List<List<Integer>> combinationSum2(int[] num, int target) {
+        
+    }
+}
+
+
+The only difference between 10.8 and 10.7 Combination Sum, is "Each number in C may only be used once in the combination."
+
+Time: O(n!), Space: O(n)
+
+public class Solution {
+    public ArrayList<ArrayList<Integer>> combinationSum2(int[] num, int target) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+		Arrays.sort(num);
+		dfs(num, 0, target, new ArrayList<Integer>(), result);
+		return result;
+    }
+    
+    public void dfs(int[] num, int start, int target, ArrayList<Integer> tmp, ArrayList<ArrayList<Integer>> result){
+		if(target == 0){
+		    result.add(new ArrayList<Integer>(tmp));
+		}
+		for(int i = start; i < num.length; i++){
+		    if(target < num[i]) return;
+		    if(i>start && num[i] == num[i-1]) continue;
+		    tmp.add(num[i]);
+		    dfs(num, i+1, target-num[i], tmp, result);
+		    tmp.remove(tmp.size()-1);
+		}
+	}
+}
+Note:  
+if(i>start && num[i] == num[i-1]) continue;  
+cannot be coded as 
+if(i>0 && num[i] == num[i-1]) continue;  
+
+Otherwise, we will have wrong answer: 
+Input:[1,1], 2
+
+Output:[]
+
+Expected:[[1,1]]
+
+

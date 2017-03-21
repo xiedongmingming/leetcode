@@ -1,0 +1,43 @@
+Candy 
+ 
+There are N children standing in a line. Each child is assigned a rating value. You are giving candies to these children subjected to the following requirements: 
+Each child must have at least one candy.
+Children with a higher rating get more candies than their neighbors.
+What is the minimum candies you must give? 
+分析:这个题目挺有意思的,如果从头遍历到尾,头给一个糖果,遇到更大的多给一个,那么遇到比头更小的值时会出问题.那么一个很明显的做法是每次找出最小的,这样给糖果必然不会错,不过是O(n^2)复杂度,算法通不过的.改进下复杂度,先排序?嗯,可以把复杂度降到O(nlogn),不知道能否通过,是否会TLE?没试过.参考了下别人的方法.从头到尾和从尾到头两次遍历.第一个给1个糖果.遇到更大的多给一块.遇到更小的给1个.最终去两次遍历中的最大值.算法很巧妙,第一次遍历可以保证比左边孩子每个rating更大的孩子都比左边的孩子更多糖果,第二次遍历可以保证每个比右边孩子rating更大的孩子都比右边的孩子更多糖果.例如:
+ratings:[1,3,2,4,5,2,2]
+left->right:[1,2,1,2,3,1,1]
+right->left:[1,2,1,1,2,1,1]
+result:[1,2,1,2,3,1,1]
+minimum candies:11
+代码：
+public class Solution{    
+	public int candy(int[] ratings){       
+		if(null == ratings || ratings.length == 0){			
+			return 0;		
+		}
+		int[] res = new int[ratings.length];		
+		int tmp = 0;		
+		for(int i = 0; i < res.length; i++){		
+			res[i] = 1;		
+		}
+		for(int i = 1; i < ratings.length; i++){		
+			if(ratings[i - 1] < ratings[i]){			
+				res[i] = res[i - 1] + 1;		
+			}
+		}		
+		for(int i = ratings.length - 2; i >= 0; i--){	
+			if(ratings[i + 1] < ratings[i]){	
+				tmp = res[i + 1] + 1;				
+				if(tmp > res[i]){					
+					res[i] = tmp;		
+				}
+			}		
+		}		
+		tmp = 0;		
+		for(int i = 0; i < res.length; i++){
+			tmp += res[i];		
+		}		
+		return tmp;   
+	}
+}

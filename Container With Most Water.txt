@@ -1,0 +1,48 @@
+Container With Most Water 
+Given n non-negative integers a1, a2, ..., an, where each represents a point at coordinate (i, ai). n vertical lines are drawn such that the two endpoints of line i is at (i, ai) and (i, 0). Find two lines, which together with x-axis forms a container, such that the container contains the most water. 
+Note: You may not slant the container. 
+开始没读懂题目，参数是vector<int> &height, 其中的第i位与第i位的值(i, height[i])是坐标平面上的一个点，它与x轴做垂直线，这样就形成了i个垂直于x轴的线，假设这些是盛水的段短，求任意两个短板间水的容量最大值。 
+O(n^2):
+
+Judge Small：Accepted!
+
+Judge Large: Time limited Exceeded
+
+int maxArea(vector<int> &height) {
+	// Start typing your C/C++ solution below
+	// DO NOT write int main() function
+	int size = height.size();
+	int max = 0;
+	for(int i = 0; i < size; ++i)
+	{
+		for(int j =i+1; j < size; ++j)
+		{
+			int min = height[i] < height[j] ? height[i] : height[j];
+			int tmp = min*(j-i);
+			if(tmp> max) max = tmp;
+		}
+	}
+	return max;
+}
+最终想到一个解决方法：取最左边的为left，最右边的为right，所有可能比这种大的情况只能是这两个高度较小的那一端向中间移动。一直循环这个动作，最大值肯定在其中。
+
+
+O(n):
+int maxArea(vector<int> &height) {
+	// Start typing your C/C++ solution below
+	// DO NOT write int main() function
+	int size = height.size();
+	int left = 0, right = size - 1;
+	int max = 0;
+	while(left < right){
+		int minheight = min(height[left], height[right]);
+		int tmp = minheight * (right - left);
+		max = max > tmp ? max : tmp;
+		if(height[left] < height[right]){
+			left++;
+		}else{
+			right--;
+		}
+	}
+	return max;
+}

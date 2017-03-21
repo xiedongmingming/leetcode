@@ -1,0 +1,91 @@
+Convert Sorted Array to Binary Search Tree
+
+Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
+
+/**
+ * Definition for binary tree
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public TreeNode sortedArrayToBST(int[] num) {
+        
+    }
+}
+
+
+题目：
+
+给定一个有序的数组，要求转换为BST
+
+思路：
+
+递归。
+
+每次找到数组中值作为BST的root，然后递归处理左半数组和右半数组分别作为左右子树
+
+
+package Level2;
+
+import Utility.TreeNode;
+
+/**
+ * Convert Sorted Array to Binary Search Tree  
+ * 
+ * Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
+ */
+public class S108 {
+
+	public static void main(String[] args) {
+		int[] num = {1,3};
+		TreeNode n = sortedArrayToBST(num);
+		n.print();
+	}
+	
+	public static TreeNode sortedArrayToBST(int[] num) {
+		return sortedArrayToBSTRec(num, 0, num.length-1);
+    }
+	
+	// 二分查找节点值，并递归创建节点
+	private static TreeNode sortedArrayToBSTRec(int[] num, int low, int high){
+		if(low > high){
+			return null;
+		}
+		int mid = low + (high-low)/2;		// 找到中值
+		TreeNode root = new TreeNode(num[mid]);		// 创建根节点
+        root.left = sortedArrayToBSTRec(num, low, mid-1);		// 递归创建左子树和右子树
+        root.right = sortedArrayToBSTRec(num, mid+1, high);
+		return root;
+	}
+
+}
+
+/**
+ * Definition for binary tree
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public TreeNode sortedArrayToBST(int[] num) {
+        return rec(num, 0, num.length-1);
+    }
+    
+    public TreeNode rec(int[] num, int low, int high){
+        if(low > high){
+            return null;
+        }
+        int mid = low + (high-low)/2;
+        TreeNode root = new TreeNode(num[mid]);
+        root.left = rec(num, low, mid-1);
+        root.right = rec(num, mid+1, high);
+        return root;
+    }
+}
