@@ -1,0 +1,83 @@
+Interleaving String
+
+
+Given s1, s2, s3, find whether s3 is formed by the interleaving of s1 and s2. 
+
+For example,
+Given:
+s1 = "aabcc",
+s2 = "dbbca", 
+
+When s3 = "aadbbcbcac", return true.
+When s3 = "aadbbbaccc", return false. 
+
+public class Solution {
+    public boolean isInterleave(String s1, String s2, String s3) {
+        
+    }
+}
+
+
+分析 
+动态规划，找到递推式，找到初始化状态，下面只是两种写法。
+
+代码1
+public class InterleavingString {
+	public boolean isInterleave(String s1, String s2, String s3) {
+		assert s1 != null && s2 != null && s3 != null;
+		int M = s1.length();
+		int N = s2.length();
+		if (M + N != s3.length()) {
+			return false;
+		}
+
+		// init
+		boolean[][] dp = new boolean[M + 1][N + 1];
+		dp[M][N] = true;
+
+		// dp
+		for (int i = M; i >= 0; --i) {
+			for (int j = N; j >= 0; --j) {
+				if (j < N && s2.charAt(j) == s3.charAt(i + j)) {
+					dp[i][j] |= dp[i][j + 1];
+				}
+				if (i < M && s1.charAt(i) == s3.charAt(i + j)) {
+					dp[i][j] |= dp[i + 1][j];
+				}
+			}
+		}
+
+		return dp[0][0];
+	}
+}
+代码2
+public class InterleavingString {
+	public boolean isInterleave(String s1, String s2, String s3) {
+		assert s1 != null && s2 != null && s3 != null;
+		int M = s1.length();
+		int N = s2.length();
+		if (M + N != s3.length()) {
+			return false;
+		}
+
+		// init
+		boolean[][] dp = new boolean[M + 1][N + 1];
+		dp[M][N] = true;
+		for (int i = M - 1; i >= 0; --i) {
+			dp[i][N] = s1.charAt(i) == s3.charAt(i + N) && dp[i + 1][N];
+		}
+		for (int j = N - 1; j >= 0; --j) {
+			dp[M][j] = s2.charAt(j) == s3.charAt(j + M) && dp[M][j + 1];
+		}
+
+		// dp
+		for (int i = M - 1; i >= 0; --i) {
+			for (int j = N - 1; j >= 0; --j) {
+				dp[i][j] = (s2.charAt(j) == s3.charAt(i + j) && dp[i][j + 1])
+						|| (s1.charAt(i) == s3.charAt(i + j) && dp[i + 1][j]);
+			}
+		}
+
+		return dp[0][0];
+	}
+}

@@ -1,0 +1,67 @@
+Jump Game II
+
+Given an array of non-negative integers, you are initially positioned at the first index of the array. Each element in the array represents your maximum jump length at that position. Your goal is to reach the last index in the minimum number of jumps. 
+For example:
+Given array A = [2,3,1,1,4] 
+The minimum number of jumps to reach the last index is 2. (Jump 1 step from index 0 to 1, then 3 steps to the last index.) 
+
+public class Solution{
+    public int jump(int[] A){
+        
+    }
+}
+这道题是JumpGame的扩展,区别是这道题不仅要看能不能到达终点,而且要求到达终点的最少步数.其实思路和JumpGame还是类似的,只是原来的全局最优现在要分成step步最优和step-1步最优(假设当前步数是step).当走到超过step-1步最远的位置时,说明step-1不能到达当前一步,我们就可以更新步数,将step+1.时间复杂度仍然是O(n),空间复杂度也是O(1).代码如下:
+public int jump(int[] A){
+    if(A == null || A.length == 0){
+        return 0;
+	}
+    int lastReach = 0;
+    int reach = 0;
+    int step = 0;
+    for(int i = 0; i <= reach && i < A.length; i++){
+        if(i > lastReach){
+            step++;
+            lastReach = reach;
+        }
+        reach = Math.max(reach, A[i] + i);
+    }
+    if(reach < A.length - 1){
+        return 0;
+	}
+    return step;
+}
+动态规划是面试中特别是onsite中非常重要的类型,一般面试中模型不会过于复杂,所以大家可以熟悉一下比较经典的几个题,比如JumpGame,MaximumSubarray等.
+
+Given an array of non-negative integers, you are initially positioned at the first index of the array. Each element in the array represents your maximum jump length at that position. Your goal is to reach the last index in the minimum number of jumps.
+For example:
+Given array A = [2,3,1,1,4]
+The minimum number of jumps to reach the last index is 2. (Jump 1 step from index 0 to 1, then 3 steps to the last index.)
+题意分析:给你一个非负数的数组,数组中的每个元素的值代表从当前位置能够跳的距离.JumpGame1是判断能不能跳到最后一个元素.本题是要求求出最小跳的次数.
+解题报告:基本思路就是求出每个元素可能跳到的最大坐标,然后串行统计一共需要多少次可以跳到末尾.以上面的输入为例,生成的每个元素可能跳到的最大坐标的数组为:2,4,4,4,8,统计跳的次数为:从0-2-4,一共需要跳2次.虽然用到了2次循环,但最多遍历一次数组中的元素,所以时间复杂度为:O(n)
+上AC代码:
+public class Solution{
+    public int jump(int[] A) {
+        if(A == null || A.length == 0 || A.length == 1){
+            return 0;
+        }
+        int start = 0;
+        int end = 0;
+        int jump_times = 0;
+        int max = 0;  
+        while(end < A.length){
+            max = 0;
+            jump_times++;
+            for(int i = start; i <= end; i++){//统计当前区间内能够跳到的最大距离
+                if((A[i] + i) >= (A.length - 1)){
+                    return jump_times;
+                }
+                if((A[i] + i) > max){
+                    max = A[i] + i;
+                }
+            }
+            start = end + 1;//更新下次搜索的区间
+            end = max;
+        }
+        return jump_times;
+    }
+}

@@ -1,0 +1,37 @@
+Implement strStr()
+
+Implement strStr(). 
+Returns a pointer to the first occurrence of needle in haystack, or null if needle is not part of haystack. 
+public class Solution{
+    public String strStr(String haystack, String needle){
+        
+    }
+}
+
+实现strStr()
+返回指向needle在haystack中第一次出现位置的指针,如果needle不是haystack的一部分,则返回null.
+分析:采用暴力方法,注意下标不要越界.(KMP待补充)
+public class Solution{
+    public String strStr(String haystack, String needle){
+		if(needle != null && needle.isEmpty()){
+			return haystack;
+		}
+		int len1 = haystack.length();
+		int len2 = needle.length();
+		if(len1 < len2){
+			return null;
+		}
+		for(int i = 0; i <= len1 - len2; ++i){
+			int j = 0;
+			int k = i;
+			while(j < len2 && needle.charAt(j) == haystack.charAt(k)){
+				j++;
+				k++;
+			}
+			if(j == len2){
+				return haystack.substring(i);
+			}
+		}
+		return null;
+    }
+}

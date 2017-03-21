@@ -1,0 +1,46 @@
+Letter Combinations of a Phone Number 
+
+Given a digit string, return all possible letter combinations that the number could represent. A mapping of digit to letters (just like on the telephone buttons) is given below.
+Input: Digit string "23" 
+Output: ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"].
+Note: Although the above answer is in lexicographical order, your answer could be in any order you want. 
+public class Solution{
+    public List<String> letterCombinations(String digits){
+    }
+}
+解题思路:还是最基本的DFS(深度优先搜索算法),但是有一点需要注意,输入有可能为"",这个比较变态,感觉这个不应该是考点之一.将数字和字符的对应关系组成了一个数组.String array[] = {"","","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"};
+这样处理起来相对要方便些.特别要注意digits中为数字的再转换,否则的话继续.
+public class Solution{
+    public String array[] = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+    public ArrayList<String> letterCombinations(String digits){
+        ArrayList<String> list = new ArrayList<String>();
+        if(digits == null){
+            return list;
+        }
+        char numArr[] = digits.toCharArray();
+        int len = digits.length();
+        StringBuffer sb = new StringBuffer();
+        dfs(list, sb, 0, numArr, len);
+        return list;
+    }
+	//tempLen表示从第几个开始搜索,sb用于存放遍历过程中生成的字符串
+    public void dfs(ArrayList<String> list, StringBuffer sb, int tempLen, char numArr[], int len){
+        if(tempLen == len){//搜索完成
+            list.add(sb.toString());
+            return;
+        }
+        if(numArr[tempLen] >= '0' && numArr[tempLen] <= '9'){//判断是否是数字
+            String tempStr = array[numArr[tempLen] - '0'];//找到数字对应的字母串
+            int strLen = tempStr.length();
+            for(int i = 0; i < strLen; i++){//遍历字母串中的每个字母
+                StringBuffer newsb = new StringBuffer(sb);//以之前遍历的字符重新生成字符串
+                newsb.append(String.valueOf(tempStr.charAt(i)));
+                dfs(list, newsb, tempLen + 1, numArr, len);
+            }
+        }else{
+            StringBuffer newsb = new StringBuffer(sb);
+            newsb.append(String.valueOf(numArr[tempLen]));//将当前不是数字的字符也添加进来
+            dfs(list, newsb, tempLen + 1, numArr, len);   
+        }
+    }
+}

@@ -1,0 +1,22 @@
+Merge Sorted Array
+
+Given two sorted integer arrays A and B, merge B into A as one sorted array.
+Note: You may assume that A has enough space (size that is greater or equal to m + n) to hold additional elements from B. The number of elements initialized in A and B are m and n respectively.
+public class Solution{
+    public void merge(int A[], int m, int B[], int n){
+    }
+}
+思路:我们当然可以立刻想到,申请一块新的长度为m+n的数组,进行归并排序,然后把数组拷贝（或者交换）回去.这个如果可以使用std::vector和swap的话,似乎也是一个有效的方法.但是题目中给定的参数是C数组,所以看来需要进行拷贝.这样归并的时间复杂度是O(m+n),同时拷贝的时间复杂度也是O(m+n).当然,如果这是面试题的话,那么问题可能没这么简单.可以做一个假设:面试官要求只能使用O(1)的空间.这样就不得不考虑利用数组A中的额外空间作为临时储存数据的地方.一开始的考虑是,将merge时较大的数据保存在A数组额外的空间里,但是这样的话,需要考虑的情况很多,例如m和n之间的关系等等.另外的考虑是,merge的数据保存在A额外的空间中,当额外空间用完之后,开始从A的起点开始继续,这时只要A的数据有被归并的话,起点数据是可以作废的.归并到最后,得到一个向左旋转n的数组.有关rotate和reverse之间的关系参见编程珠矶相关章节.
+public class Solution{
+    public void merge(int A[], int m, int B[], int n){
+        int i = m - 1;
+        int j = n - 1;
+        int k = m + n - 1;
+        while(i >= 0 && j >= 0){
+            A[k--] = A[i] > B[j] ? A[i--] : B[j--];
+        }
+        while(j >= 0){
+            A[k--] = B[j--];
+        }
+    }
+}

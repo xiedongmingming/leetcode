@@ -1,0 +1,108 @@
+Divide Two Integers
+
+
+Divide two integers without using multiplication, division and mod operator. 
+
+public class Solution {
+    public int divide(int dividend, int divisor) {
+        
+    }
+}
+
+思路清晰，就是二倍法。
+
+直接用除数去一个一个加，直到被除数被超过的话，会超时。
+解决办法每次将被除数增加1倍，同时将count也增加一倍，如果超过了被除数，那么用被除数减去当前和再继续本操作。因为一个很大的数经过对数处理后都能在可接受的大小内。比如Integer.MAX_VALUE 的log后也不过31.
+
+另外这道题很恶心的一点是在边界的处理，因为我们知道最大允许的负数的绝对值比最大允许的正数要大1. 所以以后遇到这类可能越界的问题，一律用比它大的集合来装。。
+
+比如int->long long->double double->BigDecimal  就像C++里用long long一样来对付较大的数
+
+
+
+
+这里我还查到了Java中有没有对应C++里的unsigned long long 即 64 bit unsigned integer. 答案是没有，Java里面的long也是64 bit的，但是是signed，所以在正数部分无法表示C++那么长，但还好Java有着极为方便的BigInteger类，能存放任意长度的数字。回答下面有人喷Java是“clearly written for stupid people”，看得我忍俊不禁，我只能说一句呵呵。。
+
+package Level4;
+
+/**
+ * Divide Two Integers
+ * 
+ * Divide two integers without using multiplication, division and mod operator.
+ *
+ */
+public class S29 {
+
+	public static void main(String[] args) {
+		System.out.println(divide(100, 3));
+//		System.out.println(divide(1010369383, -2147483648));
+//		System.out.println(divide(-2147483648, -2147483648));
+	}
+	
+	public static int divide(int dividend, int divisor) {
+        
+		boolean neg = false;
+		long cnt = 0;
+		long total = 0;
+		long divisorCopy = divisor;
+		long dividendCopy = dividend;
+		
+		// 负数情况
+		if((dividendCopy<0 && divisorCopy>0) || (dividendCopy>0 && divisorCopy<0)){
+			neg = true;
+		}
+		
+		// 一律先转为正数处理
+		divisorCopy = Math.abs(divisorCopy);
+		dividendCopy = Math.abs(dividendCopy);
+		long divisorPositive = divisorCopy;
+		
+		if(dividendCopy >= divisorCopy){
+			cnt = 1;
+			total = 1;
+		}else{
+			return 0;
+		}
+		
+		while(true){
+			if(dividendCopy < divisorCopy){
+				total -= 1;		// 扣除多加的一个1
+				break;
+			}
+			divisorCopy <<= 1;
+			if(dividendCopy-divisorCopy >= 0l){		// 继续两倍地增长	
+				cnt <<= 1;		// cnt *= 2   两倍地增长
+				total += (cnt>>1);	// total += cnt/2		// 只要加上增长前原来的cnt，因为之前加过一次
+			}else{		// 重头对新的dividend重新计算
+				divisorCopy >>= 1;		// divisorCopy /= 2
+				dividendCopy -= divisorCopy;
+				divisorCopy = divisorPositive;
+				cnt = 1;
+				total += 1;
+			}
+		}
+		
+		if(neg){
+			return (int)(~total+1);		// 求负数，或者直接 0-total
+		}else{
+			return (int)(total);
+		}
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

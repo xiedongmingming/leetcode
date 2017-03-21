@@ -1,0 +1,196 @@
+Max Points on a Line 
+Given n points on a 2D plane, find the maximum number of points that lie on the same straight line.
+
+给你一组点,求共线最多点的个数.思路,暴力枚举,以每个"点"为中心,然后遍历剩余点,求出以i为起点j为终点的斜率(j>i),斜率相同的点一定共线.对每个i初始化一个哈希表,key为斜率,value为该直线上的点数.遍历结束后得到和当前i点共线的点的最大值,再和全局最大值比较,最后就是结果.时间复杂度O(n2),空间复杂度O(n).
+其中有几点要注意的是:存在坐标一样的点;存在斜率不存在的点(与x轴平行的直线).
+上AC代码:
+public static int maxPoints(Point[] points){
+	if(points.length <= 2) {
+		return points.length;
+	}
+	double k = 0.0;//斜率
+	int maxPointNum = 0;
+	int tempMaxPointNum = 0;
+	int samePointNum = 0;//坐标完全相同点的个数
+	int parallelPointNum = 0;//与y轴平行
+	HashMap<Double,Integer> slopeMap = new HashMap<Double,Integer>();
+	for(int i = 0; i < points.length - 1; i++){
+		samePointNum = 1;//代表起始点会被累加上
+		parallelPointNum = 0; 
+		tempMaxPointNum = 0;
+		slopeMap.clear();
+		for(int j = i + 1; j < points.length; j++){
+			if((points[i].x == points[j].x) && ((points[i].y == points[j].y))){//坐标完全相同
+				samePointNum++;
+				continue;
+			}
+			if(points[i].x == points[j].x){//与y轴平行
+				parallelPointNum++;
+			}else{
+				if(points[i].y == points[j].y){
+					k = 0;
+				}else{
+					k = ((double)(points[i].y - points[j].y)) / (points[i].x - points[j].x);
+				}
+				if(slopeMap.get(k)==null){//斜率不存在
+					slopeMap.put(k, new Integer(1));
+					if(1 > tempMaxPointNum){
+						tempMaxPointNum = 1;
+					}
+				}else{
+					int number = slopeMap.get(k);//斜率已存在
+					number++;
+					slopeMap.put(k, new Integer(number));
+					if(number > tempMaxPointNum){
+						tempMaxPointNum = number;
+					}
+				}
+			}
+		}
+		if(parallelPointNum > 1){
+			if(parallelPointNum > tempMaxPointNum){
+				tempMaxPointNum = parallelPointNum;
+			}
+		}
+		tempMaxPointNum += samePointNum;//加上起始点和具有相同坐标的点
+		if(tempMaxPointNum > maxPointNum){
+			maxPointNum = tempMaxPointNum;
+		}
+	}
+	return maxPointNum;
+}
+
+
+
+
+
+
+Max Points on a Line
+有需要的朋友可以参考下
+Givennpoints on a 2D plane, find the maximum number of points that lie on the same straight line.
+
+
+/** 
+ * Definition for a point. 
+ * class Point { 
+ * 		int x; 
+ * 		int y; 
+ * 		Point() { x = 0; y = 0; } 
+ * 		Point(int a, int b) { x = a; y = b; } 
+ * } 
+ */ 
+ public class Solution{ 
+	public int maxPoints(Point[] points){ 
+		if(points == null || points.length == 0){
+			return 0;
+		}
+		if(points.length == 1 || points.length == 2){
+			return points.length; 
+		}
+		HashMap<Double, Integer> map = new HashMap<Double, Integer>(); 
+		double k; 
+		Point p1, p2; 
+		int size = points.length; 
+		int max = 1; 
+		int tmp = 1; 
+		for(int i = 0; i < size; i++){ 
+			tmp = 1; 
+			map.clear();
+			//put all points in the map, key is the k, and value is the numbers of points of same k with p1. 
+			p1 = points[i];//calculate points in same line. 
+			for(int j = 0; j < size; j++){ 
+				p2 = points[j]; 
+				if(i == j){// do not count p1 itself. 
+					continue; 
+				}
+				if(p1.x == p2.x && p1.y == p2.y){// if p1 and p2 is the same point
+					tmp++; 
+				}else{ 
+					if(p1.x == p2.x){
+						k = Double.MAX_VALUE;
+					}else{
+						k = ((double)p2.y - (double)p1.y)/((double)p2.x - (double)p1.x);//cast int to double 
+					}
+					if(map.containsKey(k)){ 
+						map.put(k, map.get(k) + 1); 
+					}else{
+						map.put(k, 1); 
+					} 
+				} 
+				int count = 0; 
+				for(Integer tmpint : map.values()){//count max number of points in same line with p1. 
+					if(tmpint > count){
+						count = tmpint; 
+					}
+					count += tmp; 
+					if(count > max){
+						max = count;
+					}
+				}
+			}
+		}
+		return max; 
+	} 
+}
+
+
+
+
+MyCode:
+public static int maxPoints(Point[] points) {
+		Map<Double, Integer> map = new HashMap<Double, Integer>();
+		if(points == null || points.length == 0){
+			return 0;
+		}
+		if(points.length == 1 || points.length == 2){
+			return points.length;
+		}
+		double k;
+		int max = 0;
+		int samepoint = 0;
+		
+		for(int i = 0; i < points.length; i++){
+			map.clear();
+			samepoint = 0;
+			for(int j = i + 1; j < points.length; j++){
+				if(points[i].x == points[j].x && points[i].y == points[j].y){
+					samepoint++;
+					continue;
+				}
+				
+				if(points[j].x == points[i].x){
+					k = Double.MAX_VALUE;
+				}else if(points[j].y == points[i].y){
+					k = 0;
+				}else{
+					k = ((double)points[i].y - (double)points[j].y) / ((double)points[i].x - (double)points[j].x);
+					//System.out.println("k" + k);
+				}
+				
+				if(map.containsKey(k)){
+					map.put(k, map.get(k) + 1);
+					//System.out.println("+++++++++++++++++++");
+				}else{
+					map.put(k, 1);
+				}
+			}
+			if(map.isEmpty()){
+				if(1 + samepoint > max){
+					max = samepoint + 1;
+				}
+			}else{
+				for(Integer tmp : map.values()){
+					//System.out.println(tmp + "---------");
+					if(1 + samepoint + tmp > max){
+						max = samepoint + tmp + 1;
+					}
+				}
+			}
+			//System.out.println(max);
+		}
+		return max;
+	}
+
+
+
+

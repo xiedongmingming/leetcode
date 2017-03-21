@@ -1,0 +1,26 @@
+Jump Game
+
+Given an array of non-negative integers, you are initially positioned at the first index of the array. Each element in the array represents your maximum jump length at that position. Determine if you are able to reach the last index.
+For example:
+A = [2,3,1,1,4], return true.
+A = [3,2,1,0,4], return false.
+解题报告:数组中的每个数字代表可以跳的步数,看看能不能跳到最后.
+解法:动态规划,状态转移数组state[i]代表当前从当前节点可跳到的最大节点,如果state[i]<=i&&i!=0返回false.
+AC代码:
+public class Solution{
+    public boolean canJump(int[] A){
+        int[] state = new int[A.length];
+        state[0] = A[0];
+        if(state[0] == 0 && A.length > 1){
+            return false;
+        }
+        for(int i = 1; i < A.length; i++){
+            state[i] = Math.max(state[i - 1], A[i] + i);
+            if(state[i] <= i && i != A.length - 1){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+

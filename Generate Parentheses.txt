@@ -1,0 +1,35 @@
+Generate Parentheses
+
+Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses. 
+For example, given n = 3, a solution set is: 
+
+"((()))", "(()())", "(())()", "()(())", "()()()" 
+
+class Solution{
+public:
+    vector<string> generateParenthesis(int n){
+        
+    }
+};
+题目:给定n对括号,写一个函数生成所有的构造良好的括号对.
+思路:类似这样子的东西在组合数学中有学习到,今天再查了一下,就是卡特琳数.其通项公式为.Cn表示所有包含n组括号的合法运算式的个数.对于计算,可以采用递归的方式.left、right分别代表"("、")"的数目.在每次递归函数中记录左括号和右括号的剩余数量,然后有两种选择,一个是放一个左括号,另一种是放一个右括号.当然有一些否定条件,比如剩余的右括号不能比左括号少,或者左括号右括号数量都要大于0.正常结束条件是左右括号数量都为0.
+public static List<String> generateParenthesis(int n){  
+    List<String> list = new ArrayList<String>();  
+    helper(list, "", 0, 0, n);  
+    return list;  
+}  
+public static void helper(List<String> list, String s, int left, int right, int n){  
+    if(left < right){
+        return;  
+	}
+    if(left == n && right==n){  
+        list.add(s);  
+        return;  
+    }  
+    if(left == n){  
+        helper(list, s+")", left, right + 1, n);  
+        return;  
+    }  
+    helper(list, s + "(", left + 1, right, n);  
+    helper(list, s + ")", left, right + 1, n);  
+}  

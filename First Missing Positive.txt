@@ -1,0 +1,40 @@
+First Missing Positive
+
+Given an unsorted integer array, find the first missing positive integer. For example, Given [1,2,0] return 3,
+and [3,4,-1,1] return 2. Your algorithm should run in O(n) time and uses constant space. 
+
+public class Solution{
+    public int firstMissingPositive(int[] A){
+        
+    }
+}
+package Level5;
+import java.util.Arrays;
+public class S41 {
+	public static void main(String[] args){
+		int[] A = {1, 1};
+		System.out.println(firstMissingPositive(A));
+	}
+	public static void swap(int[] A, int a, int b){
+		int tmp = A[a];
+		A[a] = A[b];
+		A[b] = tmp;
+	}
+	public static int firstMissingPositive(int[] A){
+		int i = 0;
+        while(i < A.length){
+//swap的条件是要在数组范围内,且要交换的值没有在正确位置,否则就没必要交换了;而且交换值与被交换值不能相同,否则会死循环
+        	if(A[i] > 0 && A[i] - 1 < A.length && A[i] != i + 1 && A[i] != A[A[i] - 1]){
+        		swap(A, i, A[i] - 1);
+        	}else{
+        		i++;
+        	}
+        }
+        for(i = 0; i < A.length; i++){//从头开始遍历,找到第一个不在应在位置上的元素
+        	if(A[i] != i + 1){
+        		return i + 1;
+        	}
+        }
+        return A.length + 1;//说明所有元素都在正确的位置,那么只能返回数组长度后的第一个元素了
+    }
+}

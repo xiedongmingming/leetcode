@@ -1,0 +1,82 @@
+Evaluate Reverse Polish Notation计算逆波兰式
+
+Evaluate the value of an arithmetic expression in Reverse Polish Notation. 
+Valid operators are +, -, *, /. Each operand may be an integer or another expression. 
+Some examples:
+["2", "1", "+", "3", "*"] -> ((2 + 1) * 3) -> 9
+["4", "13", "5", "/", "+"] -> (4 + (13 / 5)) -> 6
+思路
+这道题目还是挺奇怪的,读完题目感觉非常简单,但是LeetCode上的AC率只有19%,尝试第一次提交代码就ac了,有点无语,这里记录一下逆波兰表达式的概念吧.
+逆波兰表示法(Reverse Polish notation RPN 或逆波兰记法)
+是一种是由波兰数学家扬武卡谢维奇1920年引入的数学表达式方式,在逆波兰记法中,所有操作符置于操作数的后面,因此也被称为后缀表示法.逆波兰记法不需要括号来标识操作符的优先级.
+逆波兰结构由弗里德里希·鲍尔和艾兹格·迪科斯彻在1960年代早期提议用于表达式求值,以利用堆栈结构和减少计算机内存访问.逆波兰记法和相应的算法由澳大利亚哲学家、计算机学家查尔斯·汉布林(Charles Hamblin)在1960年代中期扩充.
+逆波兰表达式的解释器一般是基于堆栈的.解释过程一般是:操作数入栈;遇到操作符时,操作数出栈,求值,将结果入栈;当一遍后,栈顶就是表达式的值.因此逆波兰表达式的求值使用堆栈结构很容易实现和能很快求值.
+AC代码
+以第一次ac的代码为准吧,比较丑陋,很多可以优化的地方.
+public class Solution{
+    public static int evalRPN(String[] tokens){
+        int num1, num2, res = 0;
+        Stack<String> stack = new Stack<String>();
+        for(int i = 0; i < tokens.length; i++){
+            if(tokens[i].equals("+")){
+                num1 = Integer.parseInt(stack.pop());
+                num2 = Integer.parseInt(stack.pop());
+                res = num1 + num2;
+                stack.push(String.valueOf(res));
+            }else if(tokens[i].equals("-")){
+                num1 = Integer.parseInt(stack.pop());
+                num2 = Integer.parseInt(stack.pop());
+                res = num2 - num1;
+                stack.push(String.valueOf(res));
+            }else if(tokens[i].equals("*")){
+                num1 = Integer.parseInt(stack.pop());
+                num2 = Integer.parseInt(stack.pop());
+                res = num1 * num2;
+                stack.push(String.valueOf(res));
+            }else if(tokens[i].equals("/")){
+                num1 = Integer.parseInt(stack.pop());
+                num2 = Integer.parseInt(stack.pop());
+                res = num2 / num1;
+                stack.push(String.valueOf(res));
+            }else{
+                stack.push(tokens[i]);
+            }
+        }
+        return Integer.parseInt(stack.pop());
+    }
+}
+MyCode:
+public static int evalRPN(String[] tokens) {
+	Stack<String> stack = new Stack<String>();
+	int num1,num2,num3;
+	if(tokens == null){
+		return 0;
+	}
+	for(int i = 0; i < tokens.length; i++){
+		if(tokens[i].equals("-")){
+			num1 = Integer.parseInt(stack.pop());
+			num2 = Integer.parseInt(stack.pop());
+			num3 = num2 - num1;
+			stack.push(Integer.toString(num3));
+		}else if(tokens[i].equals("+")){
+			num1 = Integer.parseInt(stack.pop());
+			num2 = Integer.parseInt(stack.pop());
+			num3 = num2 + num1;
+			stack.push(Integer.toString(num3));
+		}else if(tokens[i].equals("*")){
+			num1 = Integer.parseInt(stack.pop());
+			num2 = Integer.parseInt(stack.pop());
+			num3 = num2 * num1;
+			stack.push(Integer.toString(num3));
+		}else if(tokens[i].equals("/")){
+			num1 = Integer.parseInt(stack.pop());
+			num2 = Integer.parseInt(stack.pop());
+			num3 = num2 / num1;
+			stack.push(Integer.toString(num3));
+		}else{
+			stack.push(tokens[i]);
+		}
+	}
+	return Integer.parseInt(stack.pop());
+}
+

@@ -1,0 +1,51 @@
+Gas Station
+
+There are N gas stations along a circular route, where the amount of gas at station i is gas[i]. You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i + 1). You begin the journey with an empty tank at one of the gas stations. Return the starting gas station's index if you can travel around the circuit once, otherwise return -1. Note: The solution is guaranteed to be unique. 
+
+public class Solution{
+    public int canCompleteCircuit(int[] gas, int[] cost){
+        
+    }
+}
+
+分析:显然,我们可以用一个变量(remain_gas)记录邮箱里剩余的油量,每到一个加油站,加上这个加油站能加的油(gas[i]),然后减去这个加油站到下个加油站(cost[i]),如果remain_gas>0说明可以到达下一站,接着同样处理,直到走完所有加油站.一个很明显的方法是,以每个加油站作为起始站,遍历所有加油站,只要发现从一个加油站开始能走完所有加油站就返回.仔细思考,你会发现这样做是有重复工作的,因为如果从加油站i开始只能走到加油站j,那么i和j之间的所有加油站显然都无法走到比j更远,这样下次就可以直接从 j+1开始遍历.
+代码:
+public class Solution{    
+	public int canCompleteCircuit(int[] gas, int[] cost){        
+		if(null == gas || null == cost || gas.length == 0 || cost.length == 0){
+			return -1;
+		}
+		int start = 0;//起始加油站索引	        
+		int remain_gas = 0;//剩余油量	        
+		while(start < gas.length){//起始加油站只能是0---gas.length - 1	        
+			remain_gas += gas[start] - cost[start];	            
+			if(remain_gas >= 0){//如果剩余的油够用,那么遍历后面的加油站,否则直接start++	            	            
+				int cur_station = 0;//当前加油站	               
+				boolean finish = true;//标识是否走完所有加油站	                
+				for(int i = 1; i < gas.length; i++){
+					cur_station = start + i < gas.length ? start + i : start + i - gas.length;
+					//遍历到数组尾时转向数组头	                    	
+					remain_gas += gas[cur_station] - cost[cur_station];	                  
+					if(remain_gas < 0){//如果剩余油量小于0,说明以start作为起始站无法走完一圈	
+						if(cur_station < start){
+							//如果遍历过程中已经越过了数组末尾,说明从任何加油站开始都不可能走完一圈	    	
+							return -1;	                        
+						}else{	                            
+							start = cur_station + 1;	                            
+							remain_gas = 0;	                            
+							finish = false;	                            
+							break;	                        
+						}	                    
+					}	                
+				}	                
+				if(finish){	                	
+					return start;
+				}
+			}else{	                
+				start++;	                
+				remain_gas = 0;	            
+			}	        
+		}	        
+		return -1;    
+	}
+}

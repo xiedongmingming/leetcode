@@ -1,0 +1,108 @@
+Insertion Sort List 
+ 
+Sort a linked list using insertion sort.
+
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode insertionSortList(ListNode head) {
+        
+    }
+}
+
+
+
+
+
+
+
+package Level4;       
+import Utility.ListNode;       
+/**   
+ * Insertion Sort List 
+ * Sort a linked list using insertion sort.   
+ */  
+ public class S135{           
+	public static void main(String[] args){           
+		ListNode head = new ListNode(4);           
+		ListNode n2 = new ListNode(2);           
+		ListNode n3 = new ListNode(1);           
+		ListNode n4 = new ListNode(3);           
+		ListNode n5 = new ListNode(1);           
+		head.next = n2;           
+		n2.next = n3;           
+		n3.next = n4;   
+		//n4.next = n5;   
+		//ListNode ret = insertionSortList(head);   
+		//ret.print();                       
+		int[] list = {-84, 142, 41, -17, -71, 170, 186, 183, -21, -76, 76, 10, 29, 81, 112, -39,- 6, -43, 58, 41, 111, 33, 69, 97, -38, 82, -44, -7, 99, 135, 42, 150, 149, -21, -30, 164, 153, 92, 180, -61, 99, -81, 147, 109, 34, 98, 14, 178, 105, 5, 43, 46, 40, -37, 23, 16, 123, -53, 34, 192, -73, 94, 39, 96, 115, 88, -31, -96, 106, 131, 64, 189, -91, -34, -56, -22, 105, 104, 22, -31, -43, 90, 96, 65, -85, 184, 85, 90, 118, 152, -31, 161, 22, 104, -85, 160, 120, -31, 144, 115};   
+		//int[] list = {1,0,2,1};   
+		//int[] list = {1,2,-1,0};           
+		ListNode dum = ListNode.create(list);   
+		//dum.print();                       
+		ListNode ret = insertionSortList(dum);           
+		ret.print();       
+	}               
+	public static ListNode insertionSortList(ListNode head){           
+		if(head == null || head.next == null){               
+			return head;           
+		}                       
+		ListNode p = head;//前后两个指针           
+		ListNode q = head.next;                       
+		while(p != null && q != null){               
+			if(p.val <= q.val){//递增顺序无需交换继续往前寻找                   
+				p = q;                   
+				q = q.next;               
+			}else{                   
+				ListNode h = head;                   
+				if(head.val >= q.val){//q元素比head元素还小的情况                       
+					ListNode qnext = q.next;                       
+					p.next = qnext;                       
+					q.next = head;                       
+					head = q;       //更新链表头                       
+					q = qnext;      //更新q的位置让q继续往前寻找                   
+				}else{                       
+					while(h.val <= q.val && h.next.val <= q.val){
+						//从head开始找查找哪里适合放置q元素注意元素相等的情况                         
+						h = h.next;                       
+					}                       
+					if(h.val <= q.val && q.val <= h.next.val){//把q元素插入适当的地方                           
+						ListNode qnext = q.next;                           
+						p.next = qnext;                           
+						q.next = h.next;                           
+						h.next = q;                           
+						q = qnext;//更新q的位置让q继续往前寻找                       	
+					}                   
+				}               
+			}           
+		}                       
+		return head;       
+	}   
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+
+
+

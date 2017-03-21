@@ -1,0 +1,65 @@
+Multiply Strings
+
+Given two numbers represented as strings, return multiplication of the numbers as a string.
+Note: The numbers can be arbitrarily large and are non-negative.
+public class Solution{
+    public String multiply(String num1, String num2){
+        
+    }
+}
+
+Analysis: Straight forward idea. Just like the way we multiply numbers. Don't forget considering the carry and be careful. e.g.
+  123 * 456,
+what we usually do is:
+      123
+*     456
+-----------
+      738
+    615
++492
+-----------
+  56088
+thus, 123*456 = 56088.
+In the same way, the algorithm is:
+from end to start position, use a new array to store temproary digit.
+A*B
+(1)For each element B[i]
+    Compute tmp = B[i] * A
+    Add tmp to the previous result, note the start position. res = res"+"tmp
+(2)Return result.
+
+To be specific,
+(1) char2int, int(char-'0');
+(2) int2char, char(int+'0')
+(3) Don't forget the carry in each add or multiply operation.
+(4) Don't forget the carry after last operation. e.g.  82+33 = 115.
+(5) Be careful with the string order and the number order.
+
+public String multiply(String num1, String num2){
+	int len1 = num1.length();
+	int len2 = num2.length();
+	if(len1 == 0 || len2==0){
+		return "0";
+	}
+	int result[] = new int[len1 + len2];
+	for(int i = 0; i < len1; i++){
+		int carry = 0;
+		int digit1 = num1.charAt(len1 - 1 - i) - '0';
+		for(int j = 0; j < len2; j++){
+			int digit2 = num2.charAt(len2 - 1 - j) - '0';
+			result[i + j] += digit1 * digit2 + carry;
+			carry = result[i + j] / 10;
+			result[i + j] %= 10;
+		}
+		result[i + len2] += carry;
+	}
+	int i = len1+len2-1;
+	while(i > 0 && result[i] == 0){
+		i--;
+	}
+	StringBuilder temp = new StringBuilder("");
+	while(i >= 0){
+		temp.append((char)(result[i--] + '0'));
+	}
+	return temp.toString();
+}

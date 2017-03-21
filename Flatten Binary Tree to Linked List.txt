@@ -1,0 +1,51 @@
+Flatten Binary Tree to Linked List
+
+Given a binary tree, flatten it to a linked list in-place.
+For example, Given
+         1
+        / \
+       2   5
+      / \   \
+     3   4   6
+The flattened tree should look like:
+   1
+    \
+     2
+      \
+       3
+        \
+         4
+          \
+           5
+            \
+             6
+click to show hints.
+Hints: 
+If you notice carefully in the flattened tree, each node's right child points to the next node of a pre-order traversal.
+/**
+ * Definition for binary tree
+ * public class TreeNode{
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x){ val = x; }
+ * }
+ */
+public class Solution{
+    public void flatten(TreeNode root){
+        if(root == null) return;
+        flat(root);
+    }
+    public TreeNode flat(TreeNode root){
+        if(root == null) return null;
+        TreeNode left = root.left;//先保存根节点的左右节点
+        TreeNode right = root.right;
+        root.left = null;//左节点为空右节点递归得到
+        root.right = flat(left);
+        TreeNode node = root;
+        while(root.right != null)//循环至最右
+            root = root.right;
+        root.right = flat(right);
+        return node;//返回根节点
+    }
+}
