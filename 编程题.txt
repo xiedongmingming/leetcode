@@ -1,0 +1,123 @@
+1、Count and Say
+The count-and-say sequence is the sequence of integers beginning as follows: 1, 11, 21, 1211, 111221, ... 
+1 is read off as "one 1" or 11.
+11 is read off as "two 1s" or 21.
+21 is read off as "one 2, then one 1" or 1211.
+Given an integer n, generate the nth sequence. 
+Note: The sequence of integers will be represented as a string. 
+public class Solution{
+    public String countAndSay(int n){
+        
+    }
+}
+2、Triangle
+Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below. For example, given the following triangle
+[
+     [2],
+    [3,4],
+   [6,5,7],
+  [4,1,8,3]
+]
+The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11). 
+Note: Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle. 
+public class Solution{
+    public int minimumTotal(List<List<Integer>> triangle){
+        
+    }
+}
+3、Insert Interval
+Given a set of non-overlapping intervals, insert a new interval into the intervals (merge if necessary). You may assume that the intervals were initially sorted according to their start times.
+Example 1: Given intervals [1,3],[6,9], insert and merge [2,5] in as [1,5],[6,9]. 
+Example 2: Given [1,2],[3,5],[6,7],[8,10],[12,16], insert and merge [4,9] in as [1,2],[3,10],[12,16]. 
+This is because the new interval [4,9] overlaps with [3,5],[6,7],[8,10]. 
+/**
+ * Definition for an interval.
+ * public class Interval{
+ *     int start;
+ *     int end;
+ *     Interval(){ start = 0; end = 0; }
+ *     Interval(int s, int e){ start = s; end = e; }
+ * }
+ */
+public class Solution{
+    public List<Interval> insert(List<Interval> intervals, Interval newInterval){
+        
+    }
+}
+4、Remove Duplicates from Sorted List II
+Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list.
+For example,
+Given 1->2->3->3->4->4->5, return 1->2->5.
+Given 1->1->1->2->3, return 2->3. 
+/**
+ * Definition for singly-linked list.
+ * public class ListNode{
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x){
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution{
+    public ListNode deleteDuplicates(ListNode head){
+        
+    }
+}
+Key to solve:
+Remove Duplicates from Sorted List II is litte different from Remove Duplicates from Sorted List I. since we need not only remove duplicated numbers, but also only left distinct number that not including dulipcated numbers. Define a dummy node, then connect head and dummy node, use a nested while loop to make n always locate last node of duplicated number ex: 1-> 1 -> 1, n is link last 1.
+5、Remove Duplicates from Sorted List
+Given a sorted linked list, delete all duplicates such that each element appear only once. For example, Given 1->1->2, return 1->2. Given 1->1->2->3->3, return 1->2->3. 
+/**
+ * Definition for singly-linked list.
+ * public class ListNode{
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x){
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution{
+    public ListNode deleteDuplicates(ListNode head){
+        
+    }
+}
+6、Linked List Cycle II
+Given a linked list, return the node where the cycle begins. If there is no cycle, return null. Follow up: Can you solve it without using extra space? 
+/**
+ * Definition for singly-linked list.
+ * class ListNode{
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x){
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution{
+    public ListNode detectCycle(ListNode head){
+        
+    }
+}
+7、Linked List Cycle
+Given a linked list, determine if it has a cycle in it. Follow up: Can you solve it without using extra space?
+/**
+ * Definition for singly-linked list.
+ * class ListNode{
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x){
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution{
+    public boolean hasCycle(ListNode head){
+        
+    }
+}

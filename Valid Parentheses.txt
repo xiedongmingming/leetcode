@@ -1,0 +1,54 @@
+Valid Parentheses
+
+
+Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+The brackets must close in the correct order, "()" and "()[]{}" are all valid but "(]" and "([)]" are not.
+
+public class Solution {
+    public boolean isValid(String s) {
+        
+    }
+}
+
+
+解法： 
+看完题目的一瞬间，我还以为就是判断Palindrome，仔细一看不是的- -！
+
+回想起当年数据结构课上讲到的类似的题，第一时间就想到了用堆栈
+
+碰到前括号，就push，碰到反括号就pop出来，将pop的元素与当前的反括号做比较，若不对应，那么就是非法的字符串。
+
+若一直遍历到字符串末尾，这时还去要区别，堆栈里的正括号都pop出来没有，若没有则表示还缺少反括号，所以return false
+
+若堆栈为空，true！
+
+import java.util.Stack;
+
+
+public class No20_ValidParentheses {
+	public static void main(String[] args){
+		System.out.println(isValid("(){}[({(})]"));
+	}
+	public static boolean isValid(String s){
+		Stack<Character> stk = new Stack<Character>();
+		int index = 0;
+		while(index < s.length()){
+			char c = s.charAt(index);
+			if(c=='(' || c=='[' || c=='{'){
+				stk.push(c);
+				index++;
+				continue;
+			}
+			if(c==')' || c==']' || c=='}'){
+				if(stk.isEmpty()) return false;
+				char ret = stk.pop();
+				if((c==')' && ret!='(') || (c==']' && ret!='[') || (c=='}' && ret!='{'))
+					return false;
+				index++;
+				continue;
+			}
+		}
+		return stk.isEmpty();
+	}
+}

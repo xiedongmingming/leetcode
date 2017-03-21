@@ -1,0 +1,163 @@
+Word Break II
+
+Given a string s and a dictionary of words dict, add spaces in s to construct a sentence where each word is a valid dictionary word. 
+
+Return all such possible sentences. 
+
+For example, given
+s = "catsanddog",
+dict = ["cat", "cats", "and", "sand", "dog"]. 
+
+A solution is ["cats and dog", "cat sand dog"]. 
+
+public class Solution{
+    public List<String> wordBreak(String s, Set<String> dict){
+        
+    }
+}
+第一步:先用动态规划找出所有的断点,题目中的例子来说,在位置0,可以选择cats或者cat,下一断点为3和4.我的代码中buildPos()方法实现.
+第二步:使用递归列出所有解.我的代码中的printResult()方法实现.
+
+package leetcode;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+public class WordBreakII{
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args){
+		String s = "catsanddog";
+		Set<String> dict = new HashSet<String>();
+		dict.add("cat");
+		dict.add("cats");
+		dict.add("and");
+		dict.add("sand");
+		dict.add("dog");
+		ArrayList<String> result  = new WordBreakII().wordBreak(s, dict);
+		for(String ss : result){
+			System.out.println(ss);
+		}
+	}
+	private Map<Integer, List<Integer>> posMap = new HashMap<Integer, List<Integer>>();
+	private ArrayList<String> result = new ArrayList<String>();
+	public ArrayList<String> wordBreak(String s, Set<String> dict){
+       for(List<Integer> list : posMap.values()){
+    	   list.clear();
+       }
+       result.clear();
+       if(dict == null || dict.isEmpty()){
+    	   return result;
+       }
+       buildPos(s, dict);
+       StringBuffer sb = new StringBuffer();
+       printResult(s, 0, sb);
+       return result;
+    }
+	void printResult(String s, int pos, StringBuffer sb){
+		if(pos == s.length()){
+			result.add(sb.toString());
+			return;
+		}
+		List<Integer> list = posMap.get(pos);
+		for(Integer newPos : list){
+			if(pos != 0){
+				sb.append(' ');
+			}
+			sb.append(s.substring(pos, newPos));
+			printResult(s, newPos, sb);
+			int appendLen = newPos - pos;
+			if(pos != 0){
+				appendLen += 1;
+			}
+			sb.delete(sb.length() - appendLen, sb.length());
+		}
+	}
+	public void buildPos(String s, Set<String> dict){
+		List<Integer> list = new ArrayList<Integer>();
+		for(int i = s.length() - 1; i >= 0; i--){
+			int len = list.size();
+			for(int j = len - 1; j >= 0; j--){
+				int index = list.get(j);
+				String sub = s.substring(i, index);
+				if(dict.contains(sub)){
+					List<Integer> list2 = posMap.get(i);
+					if(list2 == null){
+						list2 = new ArrayList<Integer>();
+						posMap.put(i, list2);
+					}
+					list2.add(index);
+				}
+			}
+			String sub = s.substring(i);
+			if(dict.contains(sub)){
+				List<Integer> list2 = posMap.get(i);
+				if(list2 == null){
+					list2 = new ArrayList<Integer>();
+					posMap.put(i, list2);
+				}
+				list2.add(s.length());
+			}
+			List<Integer> list2 = posMap.get(i);
+			if(list2 != null && !list2.isEmpty()){
+				list.add(i);
+			}
+		}
+	}
+}
+这道题不仅仅是看是不是wordbreak,还需要在此基础上把所有wordbreak的结果保存.为了把所有可能性都保存,那么就使用DFS方法来解决.DFS主要就是跳的层次不容易看出,我下面就以字符串leetcode字典leetcode作为例子画了一张图,大概讲解了如何递回和返回,这样更加有助于理解.
+public boolean wordBreakcheck(String s, Set<String> dict){
+	if(s == null || s.length() == 0){
+		return true;
+	}
+	boolean[] res = new boolean[s.length() + 1];
+	res[0] = true;
+	for(int i = 0; i < s.length(); i++){
+		StringBuilder str = new StringBuilder(s.substring(0, i + 1));
+		for(int j = 0; j <= i; j++){
+			if(res[j] && dict.contains(str.toString())){
+				res[i + 1] = true;
+				break;
+			}
+			str.deleteCharAt(0);
+		}
+	}
+	return res[s.length()];
+}
+public ArrayList<String> wordBreak(String s, Set<String> dict){  
+	ArrayList<String> res = new ArrayList<String>();  
+	if(s == null || s.length() == 0){ 
+		return res;
+	}
+	if(wordBreakcheck(s, dict)){
+		helper(s, dict, 0, "", res);  
+	}
+	return res;  
+}  
+private void helper(String s, Set<String> dict, int start, String item, ArrayList<String> res){  
+	if(start >= s.length()){  
+		res.add(item);  
+		return;  
+	}
+	StringBuilder str = new StringBuilder();  
+	for(int i = start; i < s.length(); i++){  
+		str.append(s.charAt(i));  
+		if(dict.contains(str.toString())){  
+			String newItem = new String();  
+			if(item.length() > 0){
+				newItem = item + " " + str.toString();
+			}else{
+				newItem = str.toString();
+			}
+			helper(s, dict, i + 1, newItem, res);  
+		}  
+	}  
+}
+
+
+
+
+

@@ -1,0 +1,94 @@
+Word Ladder II
+
+Given two words (start and end), and a dictionary, find all shortest transformation sequence(s) from start to end, such that:
+1. Only one letter can be changed at a time
+2. Each intermediate word must exist in the dictionary
+For example, Given:
+start = "hit"
+end = "cog"
+dict = ["hot","dot","dog","lot","log"]
+Return
+[
+	["hit","hot","dot","dog","cog"],
+	["hit","hot","lot","log","cog"]
+]
+Note:
+All words have the same length.
+All words contain only lowercase alphabetic characters.
+
+public class Solution{
+    public ArrayList<ArrayList<String>> findLadders(String start, String end, HashSet<String> dict){
+        ArrayList<ArrayList<String>> res = new ArrayList<ArrayList<String>>();
+        if(start == null || end == null){
+			return res;
+		}
+        ArrayList<String> tmparray = new ArrayList<String>();
+        if(start.equals(end)){//如果start与end相等直接返回
+        	tmparray.add(start);
+        	tmparray.add(end);
+        	res.add(tmparray);
+        	return res;
+        }
+        //新建一个hashmap保存每个节点的所有前驱
+        HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
+        map.put(end, new ArrayList<String>());//将所有的节点都添加到Map中
+        map.put(start, new ArrayList<String>());
+        for(String s : dict){
+        	map.put(s, new ArrayList<String>());
+        }
+        //利用bfs层序遍历,如果队列中有end,那么结束遍历(到最短的一层就结束)
+        Queue<String> queue = new LinkedList<String>();//层序遍历使用队列
+        queue.offer(start);
+        ArrayList<String> currentlevel = new ArrayList<String>();//用于跟踪当前的level中的节点 
+        while(!queue.isEmpty()){
+        	int level = queue.size();
+        	currentlevel.clear();
+        	for(int i = 0; i < level; i++){//层
+        		String top = queue.poll();
+        		if(dict.contains(top)){//由于是最短路径(所以同一个节点不会出现在不同的层中)
+					dict.remove(top);
+				}
+        		currentlevel.add(top);
+        	}
+        	for(String curs : currentlevel){//循环每个节点的每个char从a到z,在dict里面找是否有
+        		for(int i = 0; i < curs.length(); ++i){
+        			for(char j = 'a'; j <= 'z'; ++j){
+        				char[] tmpchar = curs.toCharArray();
+        				tmpchar[i] = j;
+        				String tmps = new String(tmpchar);//tmps是在原有基础上新建的字符串
+        				if(!curs.equals(start) && tmps.equals(end)){//第一个条件是确保start到end的转换要经过dict(不能直接转换)
+        					map.get(end).add(curs);
+        					queue.offer(tmps);//添加到队列中(以便下面条件的结束)
+        				}else if(!tmps.equals(curs) && dict.contains(tmps)){//第一个条件表示不能是自己(必须变成新的)
+        					if(!queue.contains(tmps)){//当上一层的两个对应下一层的一个时只需要一份即可
+								queue.offer(tmps);
+							}
+        					map.get(tmps).add(curs);//将tmps的前缀设为curs
+        				}
+        			}
+        		}
+        	}
+        	if(queue.contains(end)){//所有最短的路径(所以当该层遇到end后就表示找到了最短路径了)
+        		break;
+			}
+        }
+        tmparray.add(end);//只添加了end
+        buildpath(start, end, map, tmparray, res);
+        return res;
+    }
+	//根据节点的前驱生成路径(tmparray当前已经获得的节点)
+	public void buildpath(String start, String end, HashMap<String, ArrayList<String>> map, ArrayList<String> tmparray, ArrayList<ArrayList<String>> res){
+		ArrayList<String> pre = map.get(end);//获取end的所有前驱
+ 		if(end.equals(start)){//表示已经找到了完整的路径了
+ 			ArrayList<String> tmparray2 = new ArrayList<String>(tmparray);
+ 			Collections.reverse(tmparray2);//翻转
+ 			res.add(tmparray2);
+ 			return;
+ 		}
+ 		for(String s: pre){//遍历end的前驱
+ 			tmparray.add(s);
+ 			buildpath(start, s, map, tmparray, res);
+ 			tmparray.remove(tmparray.size() - 1);//把最后一次添加的内容移除(就是上面的s)
+ 		}
+	}
+}
