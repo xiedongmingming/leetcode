@@ -1,0 +1,136 @@
+Swap Nodes in Pairs
+
+
+Given a linked list, swap every two adjacent nodes and return its head. 
+
+For example,
+Given 1->2->3->4, you should return the list as 2->1->4->3. 
+
+Your algorithm should use only constant space. You may not modify the values in the list, only nodes itself can be changed. 
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode swapPairs(ListNode head) {
+        
+    }
+}
+
+解法
+一个错误的想法
+奇数偶数解法(可以但是写错)
+ private ListNode swapPairs1(ListNode head){
+        if(head==null||head.next == null)
+        return head;
+
+ 
+        ListNode retNode =new ListNode(0);
+        retNode.next = head;
+        ListNode oddNode = head;
+        ListNode evenNode = head.next;
+        int count =0;
+        ListNode node =retNode;
+       
+        while(oddNode!=null && evenNode!=null){
+             ListNode nexth = evenNode.next;
+            
+            node.next=evenNode;
+            evenNode.next=oddNode;
+            node = node.next.next;
+            
+            
+            if(nexth!=null&&nexth.next==null){// num of list is odd
+                node.next=nexth;
+                break;
+            }
+            if(nexth==null){
+                break;
+            }
+            oddNode = nexth;
+            evenNode = nexth.next;
+        }
+      
+        
+        return retNode.next;
+    }
+	精妙解法
+public class Solution {
+    public ListNode swapPairs(ListNode head) {
+        return swapPairs2(head);
+    }
+    private ListNode swapPairs2(ListNode head){
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode p = dummy;
+        //(0-p) -(1-h)-2-3-4-5
+        while(p.next != null && p.next.next != null){
+            ListNode q = p.next.next; //(0-p) -(1-pn)-(2-q)-3-4-5
+            p.next.next = q.next;//(0-p) -(1-pn)-(2-q)-(3-pnn)-4-5
+            q.next = p.next;//(0-p) -(1-pn-qn)-(2-q)-(3-pnn)-(4-qn)-5
+            p.next = q;//(0-p) -(1-qn)-(2-pn)-(3-pnn)-(4-qn)-5
+            p = p.next.next;//(0) -(1-qn)-(2-pn)-(3-p)-(4-qn)-5
+        }
+        return dummy.next;
+    }
+}
+这么看其实还是不太懂，但是如果把测试用例打印出来就不难发现，其实p是用来调配结果的指针，q是用来调换位置的。
+这道题需要用一定的空间来解，这题的空间效率大约是O（logn），非常精妙。
+用q先存奇数位，p存偶数位，通过互相调换来移动。
+测试用例大家也不必写了，做如下分享。
+private ListNode swapPairs2(ListNode head){
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode p = dummy;
+        //(0-p) -(1-h)-2-3-4-5
+        int whilecount = 1;
+        int linecount = 0;
+        while(p.next != null && p.next.next != null){
+        	linecount =0;
+            ListNode q = p.next.next; //(0-p) -(1-pn)-(2-q)-3-4-5
+            printcode(++linecount,whilecount,"ListNode q = p.next.next;",p,q);//test          
+                        
+            p.next.next = q.next;//(0-p) -(1-pn)-(2-q)-(3-pnn)-4-5
+            printcode(++linecount,whilecount,"p.next.next = q.next;",p,q);//test           
+            
+            q.next = p.next;//(0-p) -(1-pn-qn)-(2-q)-(3-pnn)-(4-qn)-5
+            printcode(++linecount,whilecount,"q.next = p.next;",p,q);//test
+                        
+            p.next = q;//(0-p) -(1-qn)-(2-pn)-(3-pnn)-(4-qn)-5
+            printcode(++linecount,whilecount,"p.next = q;",p,q);//test
+                        
+            p = p.next.next;//(0) -(1-qn)-(2-pn)-(3-p)-(4-qn)-5
+            printcode(++linecount,whilecount,"p = p.next.next;",p,q);//test
+            
+            System.out.println("------------------------------------------------------");
+            whilecount++;
+        }
+        return dummy.next;
+    }
+
+private void printcode(int linecount,int count,String string,ListNode p, ListNode q) {
+		// TODO Auto-generated method stub
+		System.out.println("Line "+linecount+" Count"+count+":"+"code=="+string);
+        System.out.println("q:"+q.val);
+        testList.write(q);
+        System.out.println("p:"+p.val);
+        testList.write(p);
+		
+	}
+	public class testList {
+	protected static void write(ListNode head){
+		for(;head.next!=null;head=head.next)
+			System.out.print(head.val+"->");
+		System.out.println(head.val);
+	}
+
+}
+

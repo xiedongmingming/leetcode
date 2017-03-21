@@ -1,0 +1,207 @@
+Permutation Sequence
+
+
+The set [1,2,3,…,n] contains a total of n! unique permutations.
+
+By listing and labeling all of the permutations in order,
+We get the following sequence (ie, for n = 3): 
+
+1."123"
+2."132"
+3."213"
+4."231"
+5."312"
+6."321"
+
+Given n and k, return the kth permutation sequence.
+
+Note: Given n will be between 1 and 9 inclusive.
+
+public class Solution {
+    public String getPermutation(int n, int k) {
+        
+    }
+}
+
+1、第一种思路，我一眼看到这种，就想到DFS，暴力搜索嘛，搜到所有的答案之后，放到list中，
+题目不是要求第K个组合是多少么，从list中get就得到了。超时。
+Java代码
+
+public class Solution {
+    public String getPermutation(int n, int k) {
+        ArrayList<String> list = new ArrayList<String>();
+        for(int i = 1; i <= n; i++){
+            StringBuffer sb = new StringBuffer(i);
+            int visit[] = new int[n+1];
+            visit[i] = 1;
+            sb.append(i);
+            int num = 1;
+            dfs(list,visit,sb,n,num);
+        }
+        return list.get(k-1);
+    }
+    public void dfs(ArrayList<String> list, int visit[], StringBuffer sb, int n, int num){
+        if(num == n){
+            list.add(sb.toString());
+        }
+        for(int i = 1; i <= n; i++){
+            if(visit[i] == 0){
+                StringBuffer tempSb = new StringBuffer(sb);
+                tempSb.append(i);
+                visit[i] = 1;
+                dfs(list,visit,tempSb,n,num+1);
+                visit[i] = 0;
+            }
+        }
+    }
+}
+2、优化第一种，还是DFS，我不罗列所有的了，每次得到一个答案，就判断当前个数是不是和k相等，
+如果相等的话，就把得到的结果return回去。还是超时了，不过好像比第一种多过了几个case。
+Java代码
+
+public class Solution {
+    public int count ;
+    public String result;
+    public String getPermutation(int n, int k) {
+        count = 0;
+        result = "";
+        for(int i = 1; i <= n; i++){
+            StringBuffer sb = new StringBuffer(i);
+            int visit[] = new int[n+1];
+            visit[i] = 1;
+            sb.append(i);
+            int num = 1;
+            dfs(visit,sb,n,num,k);
+        }
+        return result;
+    }
+    public void dfs(int visit[], StringBuffer sb, int n, int num, int k){
+        if(num == n){
+            count ++;
+            if(count == k){
+                result = sb.toString();
+                return;
+            }
+        }
+        for(int i = 1; i <= n; i++){
+            if(visit[i] == 0){
+                StringBuffer tempSb = new StringBuffer(sb);
+                tempSb.append(i);
+                visit[i] = 1;
+                dfs(visit,tempSb,n,num+1,k);
+                visit[i] = 0;
+            }
+        }
+    }
+}
+3、数学规律。我又一次的发现了，我不是什么高手。但是我要努力成为大牛。还很远，慢慢努力吧。
+扯远了，还是说代码。
+其实学过数学，知道排列组合，无重复数据的话，n个数，从1到n就有n!种组合。
+那么如果我们知道第一位数字是多少，就能算出后面的(n-1)位数的组合，也就是(n-1)!种组合。
+这个分析很明显了，n可以分成n组，每组有(n-1)!个数，
+比如n = 6，那么以1,2,3,4,5,6开头的组合必然是各有(n-1)! = 5! = 120中组合。
+我们认为组数应该从0开始，那么k要-1;
+注意此时K = 299，那么我们先要求解这个k在第几组，k/(n-1)! = 299/120 = 2,也就是说k应该在第
+3组(注意组号从0开始)，第三组的首个数字应该是3。这样第一个数字就确定了。
+确定第2个数字的时候，注意这个时候，k应该等于k % 120 = 59,为什么要这么算呢，因为每个组有120个数字，
+而且k在第三组，那么前两组加起来是240，k在第二次循环的时候，应该是从(5-1)!中确定是属于哪个组，其实
+就是确定k在第三组中是属于哪个位置。这个时候59/24 = 2,确定应该是属于第三组，
+因为在上一步中，3已经用过了，所以这个时候的5个数字是1,2,4,5,6，
+所以第三组的首个数字是4，依次类推，一直到n个数字全部算完为止。
+答案就出来了。
+Java ACpublic class Solution {
+    public String getPermutation(int n, int k) {
+        List<Integer> numList = new ArrayList<Integer>();
+        numList.add(1);
+        int sum = 1;  
+        for(int i = 2; i <= n; i++){
+            sum *= i;  
+            numList.add(i);
+        }
+        sum /= n;
+        k--;
+        StringBuffer sb = new StringBuffer();
+        for(int i = 1; i <= n; i++){
+            int currNum = k / sum;
+            sb.append(numList.get(currNum));
+            numList.remove(currNum);
+            if (i == n) {
+				break;
+			}
+            k %= sum;
+            sum /= (n-i);  
+        }
+        return sb.toString();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+分析 
+如果挨个搜的话，恐怕会超时。
+
+那就用算的方式，以n=3, k=3为例：
+
+由于我们是从0开始计数，k -= 1；
+
+首先，初始化一个链表list，list中的元素依次为：1, 2, 3；
+
+获取第一位数字：k / 2! = 1，第一个数字就是list.get(1) = 2，同时，从链表中删除已经使用的元素list.remove(1)，list剩余数字：1, 3，并且k = k % 2! = 0；
+
+获取第二个数字：k / 1! = 0，第二个数字就是list.get(0) = 1，同时，从链表中删除已经使用的元素list.remove(0)，list剩余数字：3，由于已达到最后一位，不需要操作k了。
+
+获取第三个（最后）数字：list剩余的元素，即list.get(0) = 3。
+
+最终三个数字为213。
+
+按照这个思路代码如下。
+
+代码
+
+import java.util.LinkedList;
+import java.util.List;
+
+public class PermutationSequence {
+	public String getPermutation(int n, int k) {
+		// get permutation num
+		int[] permutation = new int[n];
+		permutation[0] = 1;
+		for (int i = 1; i < n; ++i) {
+			permutation[i] = permutation[i - 1] * (i + 1);
+		}
+
+		// num list that can be used
+		List<Integer> list = new LinkedList<Integer>();
+		for (int i = 1; i <= n; ++i) {
+			list.add(i);
+		}
+
+		// process
+		StringBuilder sb = new StringBuilder();
+		int pos = n - 1;
+		k -= 1;
+		while (pos > 0) {
+			int index = k / permutation[pos - 1];
+			sb.append(list.get(index));
+			list.remove(index);
+			k = k % permutation[pos];
+			--pos;
+		}
+		sb.append(list.get(0));
+		return sb.toString();
+	}
+}

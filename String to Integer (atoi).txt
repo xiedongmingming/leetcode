@@ -1,0 +1,60 @@
+String to Integer (atoi)
+
+Implement atoi to convert a string to an integer.
+Hint: Carefully consider all possible input cases. If you want a challenge, please do not see below and ask yourself what are the possible input cases.
+Notes: It is intended for this problem to be specified vaguely (ie, no given input specs). You are responsible to gather all the input requirements up front. 
+spoilers alert... click to show requirements for atoi.
+public class Solution{
+    public int atoi(String str){
+        
+    }
+}
+分析:题目本身不难,不过要完全把握住这题的意思是极其困难.需要考虑如下情况:
+1.字符串包含非法字符
+2.正负符号
+3.空格
+4.是否超出int范围
+5.字符串为null
+6.字符串为空字符串
+代码:
+public class Solution{    
+	public int atoi(String str){	        
+		if(null == str || str.length() == 0){
+			return 0;	  
+		}
+		char[] arr = str.toCharArray();	        
+		long res = 0;//保存结果	        
+		boolean isNegative = false;//标识是否为负数	        
+		boolean existed = false;//标识符号和空格是否合法(只有在开头出现的符号和空格才是合法的)        
+		for(int i = 0; i < arr.length; i++){	        	
+			if(isDigit(arr[i])){//数字	        		        		
+				res = res * 10 + (arr[i] - 48);	        		
+				if(!existed){
+					existed = true;
+				}
+			}else if(arr[i] == '-' && !existed){//负号	        		        		
+				isNegative = true;	        		
+				if(!existed){
+					existed = true;	
+				}
+			}else if(arr[i] == '+' && !existed){//正号	        		        	    
+				if(!existed){
+					existed = true;	   
+				}
+			}else if(arr[i] == ' ' && !existed){//空格	        		
+				;	        	
+			}else{
+				break;//非法字符    
+			}
+		}
+	    if(isNegative){
+			res = 0 - res;	        	
+			return res < Integer.MIN_VALUE ? Integer.MIN_VALUE : (int)res; //考虑int的范围	        
+		}else{				
+			return res > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)res;			
+		}	    
+	}	    
+	private boolean isDigit(char c){	       
+		return c >= 48 &&c <= 57;//根据Asic码	   
+	}
+}

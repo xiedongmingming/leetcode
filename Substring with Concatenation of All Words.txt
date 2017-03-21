@@ -1,0 +1,111 @@
+Substring with Concatenation of All Words
+
+
+You are given a string, S, and a list of words, L, that are all of the same length. Find all starting indices of substring(s) in S that is a concatenation of each word in L exactly once and without any intervening characters. 
+
+For example, given:
+S: "barfoothefoobarman"
+L: ["foo", "bar"] 
+
+You should return the indices: [0,9].
+(order does not matter). 
+
+public class Solution {
+    public List<Integer> findSubstring(String S, String[] L) {
+        
+    }
+}
+
+思路：
+
+把所有的子串存入Hashtable，对原字符串进行O(n2)的搜索，看能不能用完Hashtable所有的字串
+
+
+
+
+本题用了不是很好的暴力法压线通过，下次改成用KMP的方法重写一遍。现在还太弱了，不会KMP。。。T^T
+
+还遇到了很奇怪的问题，在代码中注释体现。
+
+package Level3;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+
+/**
+ * Substring with Concatenation of All Words
+ * You are given a string, S, and a list of words, L, that are all of the same length. Find all starting indices of substring(s) in S that is a concatenation of each word in L exactly once and without any intervening characters.
+
+For example, given:
+S: "barfoothefoobarman"
+L: ["foo", "bar"]
+
+You should return the indices: [0,9].
+(order does not matter).
+ */
+public class S30 {
+
+	public static void main(String[] args) {
+		String S = "barfoothefoobarman";
+		String[] L = {"foo", "bar"};
+//		String S = "a";
+//		String[] L = {"a"};
+		
+		System.out.println(findSubstring(S, L));
+	}
+	
+	// 用暴力法压线通过，未来应该用类似KMP的方法降低复杂度！
+	public static ArrayList<Integer> findSubstring(String S, String[] L) {
+		
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		
+        Hashtable<String, Integer> ht = new Hashtable<String, Integer>();
+        // 把L中的string全部添加入hashtable
+        for (String str : L) {
+			if(ht.containsKey(str)){
+				ht.put(str, ht.get(str)+1);
+			}else{
+				ht.put(str, 1);
+			}
+		}
+        
+        int wordLen = L[0].length();
+        int numberOfWords = L.length;
+        
+        // Brute force法比较
+        for(int i=0; i<=S.length()-numberOfWords*wordLen; i++){
+        	// 每次要基于原hashtable新建一个hashtable
+        	Hashtable<String, Integer> table = new Hashtable<String, Integer>(ht);
+        	int cnt = 0;
+        	
+        	// j每次都重复地做相同的工作
+        	for(int j=i; j<=i+numberOfWords*wordLen-wordLen; j+=wordLen){
+        		String substr = S.substring(j, j+wordLen);
+            	if(table.containsKey(substr)){
+            		// 如果只用这一句会TLE
+//            		table.put(substr, table.get(substr)-1);
+            		
+            		// 改成这样就能压线AC
+            		int times = table.get(substr);
+                    if(times == 1) table.remove(substr);
+                    else table.put(substr, times - 1);
+                    
+            		cnt++;
+            	}else{
+            		break;
+            	}
+        	}
+        	
+        	if(cnt == numberOfWords){
+        		ret.add(i);
+        	}
+        }
+        
+        return ret;
+    }
+
+}
+
+
+	
+

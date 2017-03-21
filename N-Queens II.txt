@@ -1,0 +1,91 @@
+N-Queens II
+
+Follow up for N-Queens problem.
+public class Solution{
+    public int totalNQueens(int n){ 
+    }
+}
+这个其实比N-Queens要简单,只需要输出个数就可以.BFS超时,DFS很快就过了,和九度题目1254:N皇后问题一样,也是DFS.
+public class Solution{
+    public int totalNQueens(int n){
+        if(n <= 0){
+            return 0;
+        }
+        int[] queen = new int[n + 1];//从下标1开始
+        count = 0;
+        for(int i = 1; i < n + 1; i++){
+            queen[1] = i;//第一行的列
+            dfs(queen, 2, n);
+        }
+        return count;
+    }
+    public int count;
+    public void dfs(int queen[], int line, int n){//line表示行号,n表示总共的行数
+        if(line == n + 1){//当
+            count++;
+            return;
+        }
+        for(int i = 1; i < n + 1; i++){
+            if(valid(line, i, queen)){//用于判断当前行列位置是否合理
+                queen[line] = i;
+                dfs(queen, line + 1, n);//会一直遍历下去
+                queen[line] = 0;
+            }
+        }
+    }
+    public boolean valid(int row, int col, int[] queen){//在当前的行列中放置了皇后之后判断是否符合条件
+        for(int i = 1; i < row; i++){
+            if(queen[i] != 0 && (queen[i] == col || Math.abs(i - row) == Math.abs(queen[i] - col))){
+                return false;  
+			}
+        }
+        return true;
+    }
+}
+九度题目1254:N皇后问题
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StreamTokenizer;
+public class Main{
+    public static int count;
+    public static void main(String[] args) throws Exception{
+        StreamTokenizer st = new StreamTokenizer(new BufferedReader(new InputStreamReader(System.in)));
+        while (st.nextToken() != StreamTokenizer.TT_EOF){
+            int n = (int) st.nval;
+            count = 0;
+            solveNQueens(n);
+            System.out.println(count);
+        }
+    }
+    public static void solveNQueens(int n){
+        if(n <= 0){
+            return;
+        }
+        int[] queen = new int[n + 1];
+        for(int i = 1; i < n + 1 ; i++){
+            queen[1] = i;
+            dfs(queen,2,n);
+        }
+    }
+    public static void dfs(int queen[], int line, int n){
+        if(line == n+1){
+            count++;
+            return;
+        }
+        for(int i = 1; i < n+1; i++){
+            if(valid(line, i, queen)){
+                queen[line] = i;
+                dfs(queen,line+1, n);
+                queen[line] = 0;
+            }
+        }
+    }
+    public static boolean valid(int row, int col, int []queen){
+        for(int i = 1; i < row; i++){
+            if(queen[i] != 0 && (queen[i] == col || Math.abs(i - row) == Math.abs(queen[i] - col))){
+                return false;  
+			}
+        }
+        return true;
+    }
+}

@@ -1,0 +1,74 @@
+Subsets II
+
+Given a collection of integers that might contain duplicates, S, return all possible subsets. 
+Note:
+Elements in a subset must be in non-descending order.
+The solution set must not contain duplicate subsets.
+
+For example,
+If S = [1,2,2], a solution is: 
+[
+  [2],
+  [1],
+  [1,2,2],
+  [2,2],
+  [1,2],
+  []
+]
+public class Solution{
+    public List<List<Integer>> subsetsWithDup(int[] num){
+        
+    }
+}
+与之前的Subsets题相比,改用HashSet来作为天然的过滤.
+package Level4;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+public class S90{
+	public static void main(String[] args){
+		int[] num = {1, 2, 2};
+		System.out.println(subsetsWithDup(num));
+	}
+	public static ArrayList<ArrayList<Integer>> subsetsWithDup(int[] num){// 与之前相比改用HashSet来过滤
+		int len = num.length;
+	    Set<ArrayList<Integer>> set = new HashSet<ArrayList<Integer>>();
+	    Arrays.sort(num);
+	    //利用2进制对应的bit来求所有subset,2进制中,0代表不选,1代表选择
+	    for(int i = 0; i < Math.pow(2, len); i++){
+	        ArrayList<Integer> list = new ArrayList<Integer>();
+	        int tmp = i;
+	        for(int j = 0; j < len; j++){//对长为len的数,循环检查最右位是否为一
+	            int bit = tmp & 1;
+	            tmp >>= 1;
+	            if(bit == 1){
+	                list.add(num[j]);
+	            }
+	        }
+	        set.add(list);
+	    }
+	    return new ArrayList<ArrayList<Integer>>(set);
+    }
+}
+这道题假如不用HashSet过滤,那么就不适合用2进制或者选或者不选的方法:这里参考了另一种解法
+public class Solution{
+    public List<List<Integer>> subsetsWithDup(int[] num){
+        Arrays.sort(num);
+        List<List<Integer>> ret = new ArrayList<List<Integer>>();
+        List<Integer> list = new ArrayList<Integer>();
+        rec(num, ret, list, 0);
+        return ret;
+    }
+    public void rec(int[] num, List<List<Integer>> ret, List<Integer> list, int pos){
+        ret.add(new ArrayList<Integer>(list));
+        for(int i = pos; i < num.length; i++){
+            if(i != pos && i - 1 >= 0 && num[i] == num[i - 1]){
+                continue;
+            }   
+            list.add(num[i]);
+            rec(num, ret, list, i+1);
+            list.remove(list.size()-1);
+        }
+    }
+}

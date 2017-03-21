@@ -1,0 +1,86 @@
+Palindrome Number
+
+Determine whether an integer is a palindrome. Do this without extra space.
+click to show spoilers.
+Some hints: 
+Could negative integers be palindromes? (ie, -1)
+If you are thinking of converting the integer to string, note the restriction of using extra space.
+You could also try reversing an integer. However, if you have solved the problem "Reverse Integer", you know that the reversed integer might overflow. How would you handle such case?
+There is a more generic way of solving this problem.
+
+public class Solution{
+    public boolean isPalindrome(int x){
+    }
+}
+
+
+判断一个数是否是回文数，且不使用额外的空间。
+一些提示：
+负数是回文数吗？
+如果你正在考虑的整数转换为字符串，请注意使用额外空间的限制。 
+
+您也可以尝试逆转一个整数。但是，如果你已经解决了这个问题“逆转整数”，你会知道逆转整数有溢出可能。你将会如何??处理这种情况？ 
+
+找出一个更为通用的办法。
+
+
+解题思路
+将数除10，求得余数，然后将每次的得到的余数加上临时和*10即为反转数，比较是否相等。
+
+
+代码
+ public boolean isPalindrome(int x) {
+        int temp = x,y = 0;
+		while(temp > 0){
+			y = y*10 + temp%10;
+			temp /= 10;
+		}
+		if(y==x){
+			return true;
+		} else {
+			return false;
+		}
+    }
+public class S9{       
+	public static void main(String[] args){         
+		System.out.println(isPalindrome(10101));     
+	}       
+	public static boolean isPalindrome(int x){         
+		int digits = 0;         
+		int tmp = x;         //算出位数         
+		while(tmp != 0){             
+			tmp /= 10;             
+			digits++;         
+		}         
+		int div = (int) Math.pow(10, digits-1);         
+		return rec(x, div);      
+	}            
+	public static boolean rec(int x, int div){//递归比较             
+		if(x < 0){//负数             
+			return false;         
+		}         
+		if(x < 10){//一位数             
+			return true;         
+		}                  
+		int quotient = x / div;//最高位         
+		int remainder = x % 10;//最低位         
+		if(quotient != remainder){             
+			return false;         
+		}                   // 更新除数和被除数         
+		return rec((x - quotient * div - remainder) / 10, div / 100);      
+	}       
+} 
+
+
+
+
+
+
+     
+
+
+
+
+
+
+

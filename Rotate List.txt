@@ -1,0 +1,81 @@
+Rotate List
+
+
+Given a list, rotate the list to the right by k places, where k is non-negative.
+
+For example:
+Given 1->2->3->4->5->NULL and k = 2,
+return 4->5->1->2->3->NULL.
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode rotateRight(ListNode head, int n) {
+        
+    }
+}
+题目大意是将链表右移k个单位，k为非负数。
+右移链表，考察的是对链表操作的熟悉度。
+注意考虑
+1、链表有可能为空；
+2、n == 0情况，n >= len情况；
+基本思路是，先获取链表前半部分，也就是(len - n)，这个在转换之后变为新链表的后半部分。然后处理剩下的链表，这部分会变为新链表的头部。
+
+Java AC
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode rotateRight(ListNode head, int n) {
+        if(n == 0 || head == null){
+            return head;
+        }
+        int len = 0;
+        ListNode p = head;
+        while(p != null){
+            p = p.next;
+            len++;
+        }
+        n %= len;
+        if(n == len){
+            return head;
+        }
+        p = head;
+        ListNode node1 = new ListNode(0);
+        ListNode q = node1;
+        int k = 0;
+        while(k < (len-n)){
+            q.next = new ListNode(p.val);
+            q = q.next;
+            p = p.next;
+            k++;
+        }
+        ListNode node2 = new ListNode(0);
+        q = node2;
+        while(p != null){
+            q.next = new ListNode(p.val);
+            q = q.next;
+            p = p.next;
+        }
+        q.next = node1.next;
+        return node2.next;
+    }
+}

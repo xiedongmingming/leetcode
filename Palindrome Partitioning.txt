@@ -1,0 +1,71 @@
+
+Given a string s, partition s such that every substring of the partition is a palindrome. 
+
+Return all possible palindrome partitioning of s. 
+
+For example, given s = "aab",
+Return 
+
+  [
+    ["aa","b"],
+    ["a","a","b"]
+  ]
+
+
+该问题简单来说就是给定一个字符串，将字符串分成多个部分，满足每一部分都是回文串，请输出所有可能的情况。
+
+       该问题的难度比较大，很可能第一次遇到没有思路，这很正常。下面我们一点点分析，逐步理清思路。先不考虑所有的情况，针对一个符合条件的划分，每一部分都是一个回文子串，而且各部分的长度不固定。也即每一部分都是原始字符串的一个子串，且满足回文条件。所有的划分都满足上述条件，所以这就启发我们首先判断原始字符串的任意子串是否为回文子串。判断一个字符串是否为回文串最简单的方法是对字符串进行遍历。得到回文子串的结果之后我们该如何利用去获得所有可能的划分呢？此时，该问题就变为一个典型的深搜问题，问题的解空间就是所有可能划分的划分树，我们只需要遍历所有的分支直到叶节点，即为一个可能的划分。按照这个思路完成的代码如下：
+
+public class Solution {
+    public ArrayList<ArrayList<String>> partition(String s) {
+        int[][] dp=new int[s.length()][s.length()];
+        
+        ArrayList<ArrayList<String>> result=new ArrayList<ArrayList<String>>();
+        ArrayList<String> r=new ArrayList<String>();
+        
+        for(int i=0;i<s.length();i++)
+        {
+            for(int j=i;j<s.length();j++)
+            {
+                int k=0;
+                for(;k<(j-i+1)/2;k++)
+                {
+                    if(s.charAt(i+k)!=s.charAt(j-k)) break;
+                }
+                
+                if(k==(j-i+1)/2)
+                {
+                	dp[i][j]=1;
+                }
+            }
+        }
+        
+        dfs(0,s,dp,r,result);
+        
+        return result;
+    }
+    
+void dfs(int i,String s,int[][] dp,ArrayList<String> r,ArrayList<ArrayList<String>> result)
+    {
+        if(i==s.length())
+        {
+        	ArrayList<String> t=new ArrayList<String>(r);
+        	Collections.reverse(t);
+            result.add(t);
+            return;
+        }
+        
+        for(int j=i;j<s.length();j++)
+        {
+            if(dp[i][j]==1)
+            {
+                r.add(0,s.substring(i,j+1));
+                dfs(j+1,s,dp,r,result);
+                r.remove(0);
+            }
+        }
+    }
+}
+
+上述代码看似比较复杂，但其实就两个简单的部分：判断子串是否为回文串，然后深搜遍历所有的划分。判断子串是否为回文串采用了最朴素的循环遍历，在该题通过了测试，但是在第二题中将会超时，后面还会提到。深搜函数最重要的参数是第一个i，用来表示从字符串的i位置开始求划分，如果i已经超过了字符串的长度就说明完成了划分，保存一个可能的结果。如果i没有到字符串末尾，则判断从i开始到哪些位置是回文串，保存该回文串，然后从下一个位置继续深搜。如此就可以获得所有的划分。
+

@@ -1,0 +1,29 @@
+Single Number II
+
+Given an array of integers, every element appears three times except for one. Find that single one. 
+Note: Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory? 
+
+public class Solution{
+    public int singleNumber(int[] A){
+        
+    }
+}
+Analysis: Problem II is much harder than Probem I. It must be pointed out that "every element appears three times except for one" means that single number appears once or twice, not 6 times or multiples of 3. To reach a linear runtime complexity, maybe we can only solve this problem by bit operation.
+Code:
+public class Solution{    
+	public int singleNumber(int[] A){                
+		int once = 0;  		//save the bit only appears once		
+		int twice = 0; 		//save the bit appears twice		
+		int xthree = 0; 	//save the bit not appears three times		
+		for(int i = 0; i < A.length; i++){
+			int val = A[i];			
+			twice |= once & val;			
+			once ^= val;
+			//if both once and twice(once & twice) saved a certain bit, it means this bit appears three times.                       
+			xthree = ~(once & twice);//clear the bit locations which appear three times                        
+			once &= xthree;			
+			twice &= xthree;		
+		}		
+		return once;    
+	}
+}

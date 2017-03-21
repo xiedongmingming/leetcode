@@ -1,0 +1,104 @@
+Simplify Path
+
+
+Given an absolute path for a file (Unix-style), simplify it.
+
+For example,
+path = "/home/", => "/home"
+path = "/a/./b/../../c/", => "/c"
+
+
+click to show corner cases.
+Corner Cases: 
+
+?Did you consider the case where path = "/../"?
+In this case, you should return "/".
+?Another corner case is the path might contain multiple slashes '/' together, such as "/home//foo/".
+In this case, you should ignore redundant slashes and return "/home/foo".
+
+
+public class Solution {
+    public String simplifyPath(String path) {
+        
+    }
+}
+
+核心思想很简单，使用一个栈在内容为“..”的时候弹出前一个元素即可。这题可以偷懒，使用一个StringTokenizer类，这样的话可以很快的形成一个过滤掉所有斜杠后的内容栈。
+
+	public String simplifyPath(String path) {
+		Stack<String> stack = new Stack<String>();
+		StringBuffer strBuffer = new StringBuffer();
+
+		StringTokenizer st = new StringTokenizer(path, "/");
+		while (st.hasMoreTokens()) {
+			String str = st.nextToken();
+
+			// ignore "."
+			if (".".equals(str)) {
+				continue;
+			}
+			// pop out the last element
+			else if ("..".equals(str)) {
+				if (!stack.isEmpty())
+					stack.pop();
+			}
+			// push the current element
+			else {
+				stack.push(str);
+			}
+
+		}
+
+		if (stack.isEmpty())
+			strBuffer.append("/");
+
+		while (!stack.isEmpty()) {
+			strBuffer.insert(0, stack.pop());
+			strBuffer.insert(0, "/");
+		}
+
+		return strBuffer.toString();
+	}
+	
+	
+	
+	方法
+题目的要求是输出Unix下的最简路径，Unix文件的根目录为"/"，"."表示当前目录，".."表示上级目录。
+
+使用Stack来进行处理。
+
+    public String simplifyPath(String path) {
+    	Stack<String> stack = new Stack<String>();
+    	String str = "";
+    	for (int i = 0; i < path.length(); i++) {
+    		if (path.charAt(i) == '/') {
+    			if (str.equals("..")) {
+    				if (!stack.isEmpty()) {
+    					stack.pop();
+    				}
+    			} else if (!str.equals(".") && !str.equals("")) {
+    				stack.push(str);
+    			}
+    			str = "";
+    		} else {
+    			str += path.charAt(i);
+    		}
+    	}
+    	if (str.equals("..")) {
+			if (!stack.isEmpty()) {
+				stack.pop();
+			}
+    	} else if (!str.equals(".") && !str.equals("")) {
+    		stack.push(str);
+    	}
+    	
+    	if (stack.isEmpty()) {
+    		return "/";
+    	}
+    	
+    	String re = "";
+    	while (!stack.isEmpty()) {
+    		re = "/" + stack.pop() + re;
+    	}
+    	return re;
+    }

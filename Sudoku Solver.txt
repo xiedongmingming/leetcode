@@ -1,0 +1,103 @@
+Sudoku Solver
+
+Write a program to solve a Sudoku puzzle by filling the empty cells. empty cells are indicated by the character '.'. You may assume that there will be only one unique solution. A sudoku puzzle......and its solution numbers marked in red. 
+public class Solution{
+    public void solveSudoku(char[][] board){
+        
+    }
+}
+典型DFS/递归/回溯/深搜题.对于DFS说白了
+1)、什么时候返回?在本题中
+1.当x>8或y>8表示已经遍历完所有的格子,因此成功完成,返回true.
+2.当下一个搜索(子搜索)返回true,说明已经找到,返回true. 3.如果测试过本轮的所有可能解,但无一是对的,说明无解,返回false. 4.如果当前空格不是空格,则改变x,y坐标后,继续下一个空格的尝试
+2)DFS就是针对本轮的所有可能解进行逐一尝试,找到本轮的一个可能解后,这时要调用递归,基于本轮的解对下一轮(子问题)进行求解.如果下一轮(子问题)求解成功,则说明大功告成,及时返回true,停止之后的尝试.
+否则如果下一轮(子问题)求解失败,则说明本轮的解不适合子问题,因此,必须换一个本轮的解,然后基于本轮的新解,继续尝试子问题.如果已经本轮所有的解都尝试过了,也都失败了,说明本问题无解,返回false.
+当然在每次尝试子问题前和如果失败返回后,都要恢复原来的环境(撤销动作).
+所以,要想使DFS成功返回,条件就是找到满足本轮的解和这个解也要满足下一轮(子问题).
+
+另外：
+1每个backtracking的题目,最好都有独立判断isValid的程序,这样架构清楚.同时,valid判断函数在这里可以稍微研究一下.只要当前要判断的位置上的数值和本行没有重复,本列没有重复,九宫格没有重复就可以.一旦重复立即返回,减少判断次数.
+2backtracking的递归函数,怎么能没有返回值呢？！因为要判断递归的方案正确与否,所以这里的递归一定是有返回值的(除非是combination那种没有正确错误概念的backtracking)！
+3可以考虑“先放置,再判断”的方案.比如这里,首先判断当前位置是否为空,如果为空,那么放置一个元素,检查它是否正确.如果正确,就继续进行下面的递归(也就是第29行 isValid&&solveSudoku的作用).当函数返回错误之后,将刚刚的数值变为空,再进行下一次尝试即可.
+4 所有的方案(k从1到9)完毕之后,应该返回错误,这个是不应该被忽略的.
+http://blog.csdn.net/zxzxy1988/article/details/8586289
+
+
+package Level4;
+public class S37{
+	public static void main(String[] args){
+		char[][] board = {
+				{'.','.','9','7','4','8','.','.','.'},
+				{'7','.','.','.','.','.','.','.','.'},
+				{'.','2','.','1','.','9','.','.','.'},
+				{'.','.','7','.','.','.','2','4','.'},
+				{'.','6','4','.','1','.','5','9','.'},
+				{'.','9','8','.','.','.','3','.','.'},
+				{'.','.','.','8','.','3','.','2','.'},
+				{'.','.','.','.','.','.','.','.','6'},
+				{'.','.','.','2','7','5','9','.','.'},
+		};
+		solveSudoku(board);
+		for(int i = 0; i < 9; i++){
+			for(int j = 0; j < 9; j++){
+				System.out.print(board[i][j]);
+			}
+			System.out.println();
+		}
+	}
+	public static void solveSudoku(char[][] board){
+		dfs(board, 0, 0);//从第0行第0列开始检查(返回值为布尔类型)
+    }
+	//返回值表示从当前位置开始能否找到满足条件的数独表
+	public static boolean dfs(char[][] board, int x, int y){
+		if(x > 8 || y > 8){//全部搜索完毕
+			return true;
+		}
+		if(board[x][y] == '.'){//如果当前是空格
+			for(int k = 1; k <= 9; k++){//向其中添加数值
+				if(isValid(board, x, y, (char)('0' + k))){//说明在当前空格找到一个满足条件的数字
+					board[x][y] = (char)('0' + k);
+					int nextX = x;
+					int nextY = y + 1;
+					if(nextY == 9){
+						nextY = 0;
+						nextX++;
+					}
+					//对下一个空格搜索数字,如果下一个位置找到满足条件的数字,就此返回.否则改变当前空格的数字继续测试
+					if(dfs(board, nextX, nextY)){//在当前位置上设置的固定值之后是否能找到满足条件的整个数独表
+						return true;
+					}
+					board[x][y] = '.';//若当前值没能找到满足条件的数独表则将之前设置的值清空
+				}
+			}
+			return false;//对于当前空格,如果所有的数字都不满足,则无解！
+		}else{//如果当前已经有数字就跳过继续搜索
+			int nextX = x;
+			int nextY = y + 1;
+			if(nextY == 9){
+				nextY = 0;
+				nextX++;
+			}
+			return dfs(board, nextX, nextY);//直接在此返回结果
+		}
+	}
+	//用于判断在指定位置处放置指定值是否符合要求(x和y分别表示坐标,k表示要放置的数值)
+	public static boolean isValid(char[][] board, int x, int y, char k){
+		for(int i = 0; i < 9; i++){			//同列检查
+			if(board[i][y] == k){
+				return false;
+			}
+			if(board[x][i] == k){			//同行检查
+				return false;
+			}
+		}
+		for(int i = 0; i < 3; i++){			//九宫格检查
+			for(int j = 0; j < 3; j++){
+				if(board[3 * (x / 3) + i][3 * (y / 3) + j] == k){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+}

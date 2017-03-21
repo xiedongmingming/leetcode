@@ -1,0 +1,27 @@
+Pow(x, n)
+
+Implement pow(x, n). 
+
+public class Solution {
+    public double pow(double x, int n) {
+        
+    }
+}
+
+//递归法（"折半"递归，不要用常规的一个个乘，效率很低）
+public class Solution {
+    public double pow(double x, int n) {
+        if(n==0)
+            return 1;
+        if(n==1)
+            return x;
+        if(n==-1)
+            return 1/x;
+        if(n%2==0){
+            double tmp=pow(x,n>>1);     //减少子递归
+            return tmp*tmp;
+        }else{
+            return pow(x,n-1)*x;
+        }
+    }
+}

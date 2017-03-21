@@ -1,0 +1,50 @@
+Pascal's Triangle
+
+Given numRows, generate the first numRows of Pascal's triangle.
+
+For example, given numRows = 5,
+Return 
+
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+
+
+public class Solution {
+    public List<List<Integer>> generate(int numRows) {
+        
+    }
+}
+
+分析：此题就是找规律，规律很简单，一般情况下（除去边界）某一行第i个数字是上一行第i-1个+第i个。代码：
+public class Solution{    
+	private ArrayList<ArrayList<Integer>> res=new ArrayList<ArrayList<Integer>>();    
+	public ArrayList<ArrayList<Integer>> generate(int numRows){        
+		if(numRows<1){           
+			return res;   
+		}
+		for(int deep=1;deep<=numRows;deep++){            
+			ArrayList<Integer> item=rec_generate(deep,numRows);            
+			res.add(item);        
+		}        
+		return res;    
+	}    
+	private ArrayList<Integer> rec_generate(int deep,int numRows){        
+		ArrayList<Integer> item=new ArrayList<Integer>();        
+		if(deep==1)
+			item.add(1);        
+		else{            
+			item.add(1);            
+			int lastDep=deep-2;            
+			for(int i=1;i<deep-1;i++){                
+				item.add(res.get(lastDep).get(i-1)+res.get(lastDep).get(i));            
+			}            
+			item.add(1);        
+		}        
+		return item;    
+	}
+}

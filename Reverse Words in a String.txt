@@ -1,0 +1,94 @@
+Reverse Words in a String
+
+Given an input string, reverse the string word by word. 
+For example,
+Given s = "the sky is blue",
+return "blue is sky the". 
+
+click to show clarification.
+Clarification: 
+What constitutes a word?
+A sequence of non-space characters constitutes a word.
+Could the input string contain leading or trailing spaces?
+Yes. However, your reversed string should not contain leading or trailing spaces.
+How about multiple spaces between two words?
+Reduce them to a single space in the reversed string.
+
+
+这个题不难,结果我做的时候出现了TIME LIMIT EXCEED 
+之前是用栈做的,把每个单词push进去,pop出来,就是倒序了么,感觉算法肯定是O(n),就算testcase很长,怎么会报错呢.后来发现是用了String的问题,还是学得不精,大家可以搜下String和StringBuffer的区别
+http://blog.csdn.net/yirentianran/article/details/2871417
+这篇博客讲得挺清楚的,就是String是final,不能继承,一旦创建出来了,e.g String s="sky"不能更改了
+那么在堆内存中就有个s,内容是sky,如果要s+=" is",那么还得重新创建一个string,加上 is,最后成了 s="sky is"
+
+这个过程其实就用了StringBuffer的append
+
+所以在操作这样的字符串，最好还是用stringbuffer， 自己试验过了才发现stirng的操作相当耗时耗内存
+
+
+public class Solution {
+    public String reverseWords(String s){
+        //Stack<String> st = new Stack<String>();
+        int start = 0;
+        int end = s.length() - 1;
+        while(start <= s.length() - 1 && s.charAt(start) == ' '){
+            start++;
+        }
+        while(end >=0 && s.charAt(end) == ' '){
+            end--;
+        }
+        if(start > end){//找到了有效的起始位置和结束位置
+			return "";
+		}
+        StringBuffer result= new StringBuffer();
+        while(start <= end){
+        	StringBuffer word = new StringBuffer();
+        	while(end >= start && s.charAt(end) != ' '){
+        		word.append(s.charAt(end));
+				end--;
+        	}
+        	word.reverse();
+        	if(!word.equals("")){
+				result.append(word + " ");
+			}
+        	while(end >= start && s.charAt(end) == ' '){
+				end--;
+			}
+        }
+        return result.substring(0, result.length() - 1).toString();
+    }
+}
+
+MyCode:
+public static String reverseWords(String s){
+	int index = 0;
+	//ArrayList<String> array = new ArrayList<String>();
+	if(s == null){
+		return null;
+	}
+	String news = s.trim();
+	//System.out.println(news);
+	
+	char lastchar = ' ';
+	char[] chars = news.toCharArray();
+	//System.out.println(new String(chars));
+	
+	char[] newchars = new char[chars.length];
+	for(int i = 0; i < chars.length; i++){
+		if(chars[i] == ' ' && lastchar == ' '){
+			continue;
+		}else{
+			newchars[index++] = chars[i];
+		}
+		lastchar = chars[i];
+	}
+	String newstring = new String(newchars, 0, index);
+	//System.out.println(newstring);
+	String[] sarray = newstring.split(new String(" "));//String.split(newstring, ' ');
+	//System.out.println(sarray.toString());
+	StringBuilder sb = new StringBuilder();
+	for(int i = sarray.length - 1; i >= 0; i--){
+		sb.append(sarray[i] + ' ');
+	}
+	return (sb.deleteCharAt(sb.length() - 1)).toString();
+}

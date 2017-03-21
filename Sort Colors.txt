@@ -1,0 +1,78 @@
+Sort Colors 
+
+Given an array with n objects colored red, white or blue, sort them so that objects of the same color are adjacent, with the colors in the order red, white and blue. Here, we will use the integers 0, 1, and 2 to represent the color red, white, and blue respectively. 
+Note:
+You are not suppose to use the library's sort function for this problem. 
+click to show follow up.
+Follow up:
+A rather straight forward solution is a two-pass algorithm using counting sort. First, iterate the array counting number of 0's, 1's, and 2's, then overwrite array with total number of 0's, then 1's and followed by 2's. Could you come up with an one-pass algorithm using only constant space?
+描述:给一个数组,数组由三种颜色对象组成,分别为红、白、蓝,对数组进行排序,使相同颜色的对象相邻,按照先红再白最后蓝的顺序进行排列.在这里,我们使用整数0、1、2来分别代表红白蓝三种颜色.(不要使用库函数)
+在这里我介绍一种方法不是很普及,但是这种方法的时间复杂度是0(n).
+public class Solution {
+    public void sortColors(int[] A) {
+        int count0 = 0;
+		int count1 = 0;
+		int count2 = 0;
+		for(int i = 0; i < A.length; i++){
+			if(A[i] == 0){
+				count0++;
+			}
+			if(A[i] == 1){
+				count1++;
+			}
+			if(A[i] == 2){
+				count2++;
+			}
+		}
+		for(int i = 0; i < count0; i++){
+			A[i] = 0;
+		}
+		for(int i = count0; i < count0+count1; i++){
+			A[i] = 1;
+		}
+		for(int i = count0+count1; i < count0+count1+count2; i++){
+			A[i] = 2;
+		}
+    }
+}
+以上这种方法通过系统验证了,想法很简单.分别统计出现0、1、2出现的次数,然后直接给数组赋值就ok了.
+
+ 
+
+题解:
+这道题就是应用指针来解决了,可以说叫3指针吧.一个指针notred从左开端找,指向第一个不是0(红色)的地位;一个指针notblue从右开端往左找,指向第一个不是2(蓝色)的地位.然后另一个新的指针i指向notred指向的地位,往后遍历,遍历到notred的地位.这途中须要断定:
+当i指向的地位便是0的时辰,申明是红色,把他互换到notred指向的地位,然后notred++,i++.
+当i指向的地位便是2的时辰,申明是蓝色,把他互换到notblue指向的地位,然后notred--.
+当i指向的地位便是1的时辰,申明是白色,不须要互换,i++即可.
+代码如下:
+public static void swap(int A[], int i, int j){
+    int tmp = A[i];
+    A[i] = A[j];
+    A[j] = tmp;
+}
+public static void sortColors(int A[]){
+	if(A == null || A.length==0){
+		return;
+	}
+	int notred = 0;
+	int notblue = A.length - 1;  
+	while(notred < A.length && A[notred] == 0){
+		notred++;
+	}
+	while(notblue >= 0 && A[notblue] == 2){
+		notblue--;
+	}
+	int i = notred;
+	while(i<=notblue){
+		if(A[i] == 0){
+			swap(A, i, notred);
+			notred++;
+			i++;
+		}else if(A[i]==2){
+			swap(A, i, notblue);
+			notblue--;
+		}else{
+			i++;
+		}
+	}
+}

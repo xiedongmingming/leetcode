@@ -1,0 +1,377 @@
+
+Given a string s, partition s such that every substring of the partition is a palindrome. 
+
+Return the minimum cuts needed for a palindrome partitioning of s. 
+
+For example, given s = "aab",
+Return 1 since the palindrome partitioning ["aa","b"] could be produced using 1 cut. 
+
+public class Solution {
+    public int minCut(String s) {
+        
+    }
+}
+
+public class Solution {
+    public int minCut(String s) {
+        // Start typing your Java solution below
+        // DO NOT write main() function
+        char[] c = s.toCharArray();
+        boolean[][] isPal = new boolean[c.length][c.length];
+        for (int i = 0; i < c.length; i++) {
+            isPal[i][i] = true;
+        }
+        for (int k = 1; k < c.length; k++) {
+            for (int i = 0; i + k < c.length; i++) {
+                int j = i + k;
+                isPal[i][j] = c[i] == c[j] && (i + 1 < j - 1 && isPal[i + 1][j - 1] || i + 1 >= j - 1);
+            }
+        }
+        int[] f = new int[s.length() + 1];
+        for (int i = 0; i <= s.length(); i++) {
+            f[i] = i - 1;
+        }
+        for (int i = 1; i <= s.length(); i++) {
+            for (int j = i; j >= 1; j--) {
+                if (isPal[j - 1][i - 1] && f[j - 1] + 1 < f[i]) {
+                    f[i] = f[j - 1] + 1;
+                    if (f[i] == 0) {
+                        break;
+                    }
+                }
+            }
+        }
+        return f[s.length()];
+    }
+}
+
+
+该问题是问题I的变种，现在不求所有的划分，而只求分组个数最小的划分。
+
+2.1 深搜
+该问题一开始的思路肯定是直接照搬问题I的方法，采用DFS去求解。如果我们按照这个思路去实现，提交的时候会发现算法超时，即使进行了一系列的调优也不行。下面是采用DFS的最原始代码：
+void dfs(int i,int parts,int len,int[][] dp)
+{
+        if(i==len)
+        {
+            if(parts<minParts)
+            {
+                minParts=parts;
+            }
+            return;
+        }
+        
+        for(int j=i;j<len;j++)
+        {
+            if(dp[i][j]==1)
+            {
+                dfs(j+1,parts+1,len,dp);
+            }
+        }
+}
+代码是一个典型的深搜，符合深搜的基本框架，但是当输入字符串是“ababababababababababababcbabababababababababababa”，算法超时。实际上这个字符串还是很短的，超时说明算法复杂度太高，或者可能需要对解空间进行剪枝，这就启发我首先试试剪枝是否有效。最容易想到的剪枝策略是：如果当前的分割的个数已经大于当前最优解，则我们停止对该路径的深搜，需要的修改是对深搜的判断条件进行修改，修改之后为：
+void dfs(int i,int parts,int len,int[][] dp)
+    {
+        if(i==len)
+        {
+            if(parts<minParts)
+            {
+                minParts=parts;
+            }
+            return;
+        }
+        
+        for(int j=i;j<len;j++)
+        {
+            if(dp[i][j]==1&&parts<minParts)
+            {
+                dfs(j+1,parts+1,len,dp);
+            }
+        }
+}
+但是这样还是超时，当字符串为：“fifgbeajcacehiicccfecbfhhgfiiecdcjjffbghdidbhbdbfbfjccgbbdcjheccfbhafehieabbdfeigbiaggchaeghaijfbjhi”时，算法超时。
+
+我还是不死心，感觉肯定是深搜的思路不对，导致对算法的剪枝力度不够，通过修改应该是可以通过的。后来一想，问题要求最短的分割，我们肯定需要首先考虑最长的回文子串，而之前的遍历都是从最短的回文子串开始遍历，可能这个是导致剪枝能力差的原因。按照这个思路修改代码，只需要将遍历回文子串的顺序修改一下即可：
+void dfs(int i,int parts,int len,int[][] dp)
+    {
+        if(i==len)
+        {
+            if(parts<minParts)
+            {
+                minParts=parts;
+            }
+            return;
+        }
+        
+        for(int j=len-1;j>=i;j--)
+        {
+            if(dp[i][j]==1&&parts<minParts)
+            {
+                dfs(j+1,parts+1,len,dp);
+            }
+        }
+}
+代码与上面的不同是修改了for循环的遍历次序，先从最长的回文子串开始遍历。但是结果令人失望，还是超时！当字符串是：
+
+“apjesgpsxoeiokmqmfgvjslcjukbqxpsobyhjpbgdfruqdkeiszrlmtwgfxyfostpqczidfljwfbbrflkgdvtytbgqalguewnhvvmcgxboycffopmtmhtfizxkmeftcucxpobxmelmjtuzigsxnncxpaibgpuijwhankxbplpyejxmrrjgeoevqozwdtgospohznkoyzocjlracchjqnggbfeebmuvbicbvmpuleywrpzwsihivnrwtxcukwplgtobhgxukwrdlszfaiqxwjvrgxnsveedxseeyeykarqnjrtlaliyudpacctzizcftjlunlgnfwcqqxcqikocqffsjyurzwysfjmswvhbrmshjuzsgpwyubtfbnwajuvrfhlccvfwhxfqthkcwhatktymgxostjlztwdxritygbrbibdgkezvzajizxasjnrcjwzdfvdnwwqeyumkamhzoqhnqjfzwzbixclcxqrtniznemxeahfozp”时，算法超时。我还是不相信确实是深搜的原因，所以将代码拷贝到eclipse中运行，结果运行了半小时也没有得出结果。好吧，只能承认算法思路不对。
+
+       重新思考算法，DFS超时一般的原因都是由于递归过程中的重复子问题导致重复计算，最典型的例子是斐波那契数列的计算，递归和非递归算法的运行效率完全是两个概念，貌似这个问题和斐波那契数列问题类似。
+
+       重新审视上面的DFS代码，我们会发现变量只有前两个，后两个都是常量，这样深搜的过程中可能就会存在重复子问题。对字符串“ababa”运行算法I，可以得到该字符串的所有可能回文子串划分为： 
+
+a b a b a 
+a b aba 
+a bab a 
+aba b a 
+ababa 
+如果用(i,j)表示从位置i开始，当前已经有j个分割的情况，则运行最原始的深搜算法可以得到调用树：
+
+
+
+
+通过上面的调用树，我们可以知道上面的深搜确实存在重复计算的问题。但是为什么算法I就可以采用深搜完成呢？这是因为算法I要获得所有的划分，因而针对算法二是重复子问题的时候，它们在算法I中对应的是不同的划分，因而不会存在重复子问题。事实上，算法I的输入由于遍历整个解空间，给定的字符串都很短，最长的串也只是“eegiicgaeadbcfacfhifdbiehbgejcaeggcgbahfcajfhjjdgj”，深搜足以应对。
+
+       但是在算法II中，由于只计算一个最短划分，所以本来属于不同划分的结果在求划分数时其实是一样的，这就会导致重复子问题。搞明白超时的来源，代码修改就很容易了，解决重复子问题的方法主要有两种：备忘录或者DP。采用备忘录的方法时，代码还是采用深搜，但是通过保存之前已经计算过的值来避免重复计算，代码如下：
+void dfs(int i,int parts,int len,int[][] dp,int[][] count)
+    {
+        if(count[i][parts]==1) return;
+        
+        if(i==len)
+        {
+            if(parts<minParts)
+            {
+                minParts=parts;
+            }
+            return;
+        }
+        
+        count[i][parts]=1;
+        
+        for(int j=len-1;j>=i;j--)
+        {
+            if(dp[i][j]==1&&parts<minParts)
+            {
+                dfs(j+1,parts+1,len,dp,count);
+            }
+        }
+    }
+上述代码通过创建一个count数组用来表示之前的子问题是否已经计算过，如果计算过就不必再去深搜。但是很遗憾，上述代码居然还超时！！！当字符串为
+
+“aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa”时，算法超时。不过让人欣慰的一点是，在上一次优化中超时的字符串在备忘录方法中没有超时，很快就可以得到结果。针对上面的长字符串，也可以较快得到结果。但是还超时，就说明一开始的判断任意子串是否为回文子串的复杂度太高。这个问题不能通过单纯地修改深搜为DP解决。
+
+       算法II判断字符串从i到j的子串是否为回文串时用了算法I中最朴素的蛮力方法，也即通过遍历的方法判断从i到j的子串是否为回文串，这种方法的复杂度为O(n3)。这是因为总共有n2个子串，每个子串判断是否为回文串的复杂度最大为O(n)，因而整个判断的复杂度为O(n3)，这个可以通过公式简单推导。由于深搜部分采用了备忘录方法，算法复杂度实际为O(n2)，现在算法还超时只能说明判断子串是否为回文串的朴素方法太慢，需要修改。事实上，该部分确实有更优的算法，朴素方法太慢的原因是我们没有考虑相邻子串之间的相关性。假设现在我们已经知道S(i,j)是回文串，则我们可以在O(1)的时间内知道S(i-1,j+1)是否是回文串。这是因为字符串S(i-1,j+1)是在字符串S(i,j)的两头各添加一个字符构成的新串，如果现在满足S(i-1)等于S(j+1)，则说明S(i-1,j+1)是回文串，否则就不是回文串。这表明我们可以利用子串之间的相关性来快速判断一个子串是否是回文串。该问题也是一个DP问题，算法复杂度只有为O(n2)，相比朴素的算法，复杂度降低了一个数量级。定义P[i][j]表示字符串从i到j的子串是否为回文串，则P[i][j]满足公式：P[i][j] = (str[i] == str[j] && P[i+1][j-1])。
+
+获得公式之后，DP算法面临的下一个问题是计算顺序和初始化的问题。P[i][j]依赖于P[i+1][j-1]，表示我们必须要从最后一行开始从左到右计算一个上对角矩阵。元素的初始化就是对最左侧的两条斜对角线进行初始化，如下图所示：
+
+
+上图黄色部分是没有意义的部分，因为i到j的子串中i必须小于等于j。绿色部分表示单个字符的子串，肯定都是回文串。蓝色部分也是需要初始化的部分，因为它依赖于黄色没有意义的部分，该部分的初始化只需要判断两个字符是否相等。
+
+综合上面的分析，我们得出第一个可以AC的代码： 
+
+
+
+
+
+动态规划：
+
+记忆化搜索实现，能pass small data set，但运行large data set里 TLE了。
+
+
+public class Solution {
+    private java.util.Map<String, Integer> map = new java.util.HashMap<String, Integer>();
+    private java.util.Map<String, Boolean> palinMap = new java.util.HashMap<String, Boolean>();
+    public int minCut(String s) {
+       if (s.length() == 1)
+            return 0;
+        
+        if (map.get(s) != null)
+            return map.get(s);
+        
+        if (isPalindrome(s)) {
+            map.put(s, 0);
+            return 0;
+        }
+        
+        int ret = s.length()-1;
+        
+        for (int i=1; i<s.length(); i++) {
+            ret = Math.min(ret, minCut(s.substring(0, i))+1+minCut(s.substring(i)));
+        }
+        map.put(s, ret);
+        return ret;
+    }
+    
+    public boolean isPalindrome(String s) {
+        if (palinMap.get(s) != null)
+            return palinMap.get(s);
+        boolean ret = true;
+        int i=0, j=s.length()-1;
+        while (i < j) {
+            char b = s.charAt(i++);
+            char e = s.charAt(j--);
+            if (b != e) {
+                ret = false;
+                break;
+            }
+        }
+        palinMap.put(s, ret);
+        return ret;
+    }
+}
+
+这里采用了记忆化搜索方法记录了字符串是否为回文串的信息，但依然TLE，看样子得想别的办法了，该算法改用递推法实现为：
+
+
+public class Solution {
+    
+    private java.util.Map<String, Boolean> palinMap = new java.util.HashMap<String, Boolean>();
+    public int minCut(String s) {
+       int len = s.length();
+       int[][] data = new int[len][len];
+       for (int i=0; i<len; i++)
+            for (int j=0; j<len; j++)
+                if (i==j)
+                    data[i][j] = 0;
+                else
+                    data[i][j] = s.length()-1;
+       for (int add=1; add<len; add++)
+            for (int i=0; i<len&&(i+add)<len; i++) {
+                 if (isPalindrome(s.substring(i, i+add+1))) {
+                     data[i][i+add] = 0;
+                 } else {
+                     for (int d=1; d<=add; d++) {
+                         data[i][i+add] = Math.min(data[i][i+add], data[i][i+d-1]+data[i+d][i+add]+1);
+                    }
+                 }
+            }
+        return data[0][len-1];
+    }
+    
+    public boolean isPalindrome(String s) {
+        if (palinMap.get(s) != null)
+            return palinMap.get(s);
+        boolean ret = true;
+        int i=0, j=s.length()-1;
+        while (i < j) {
+            char b = s.charAt(i++);
+            char e = s.charAt(j--);
+            if (b != e) {
+                ret = false;
+                break;
+            }
+        }
+        palinMap.put(s, ret);
+        return ret;
+    }
+}
+
+以上算法的时间复杂度为N^3，实际上不仅得出了从0到N的最小分隔数，还得出了从任意Ni到任意Nj的最小分隔数，而我们要求的只是从0到N的最小分隔数。这就好像咱们用Floyd算法来计算一个只需要Dijkstra算法来解决的问题。得到了多余解，时间复杂度也高了。那能不能优化到N^2呢，答案是肯定的。
+
+利用Dijkstra的思想，求出0到其它节点最小分隔数，要注意的是，我们也得改进回文串的判定方法，将其时间复杂度也降至N^2，否则依然无法通过LeetCode的Large Judge。最新代码如下：
+
+
+public class Solution {
+    public int minCut(String s) {
+	//回文串的判定二维数组
+        boolean[][] isPalindrome = new boolean[s.length()+1][s.length()+1];
+        for (int i=0; i<s.length(); i++) {
+           for (int j=0; j<=Math.min(i, s.length()-1-i); j++){
+                if (s.charAt(i-j) == s.charAt(i+j))
+                    isPalindrome[i-j][i+j+1] = true;
+                else
+                    break;
+            }
+            if (i<s.length()-1)
+                for (int j=0; j<=Math.min(i, s.length()-2-i); j++) {
+                    if (s.charAt(i-j) == s.charAt(i+1+j))
+                        isPalindrome[i-j][i+j+2] = true;
+                    else
+                        break;
+                }
+        }
+            
+        //Dijkstra求从0开始到任意字符的最小分隔数
+        int[] data = new int[s.length()+1];
+        boolean[] visit = new boolean[s.length()+1];
+        Arrays.fill(data, s.length()-1);
+        for (int i=1; i<=s.length(); i++) {
+            if (isPalindrome[0][i])
+                data[i] = 0;
+        }
+        for (int i=0; i<s.length(); i++) {
+            int min = 0;
+            for (int j=1; j<=s.length(); j++) {
+                if (!visit[j]) {
+                    if (min == 0 || data[j]<data[min])
+                        min = j;
+                }
+            }
+            visit[min] = true;
+            for (int j=min+1; j<=s.length(); j++) {
+                if (!visit[j] && isPalindrome[min][j]) {
+                    data[j] = Math.min(data[j], data[min]+1);
+                }
+            }
+        }
+        return data[s.length()];
+    }
+}
+Large Judge运行结果：
+
+
+"a"	0	0	
+   
+"ab"	1	1	
+   
+"bb"	0	0	
+   
+"cdd"	1	1	
+   
+"dde"	1	1	
+   
+"efe"	0	0	
+   
+"fff"	0	0	
+   
+"abbab"	1	1	
+   
+"leet"	2	2	
+   
+"coder"	4	4	
+   
+"abcccb"	1	1	
+   
+"cabababcbc"	3	3	
+   
+"cbbbcc"	1	1	
+   
+"ccaacabacb"	3	3	
+   
+"racecar"	0	0	
+   
+"danaranad"	0	0	
+   
+"ababbbabbaba"	3	3	
+   
+"amanaplanacanalpanama"	0	0	
+   
+"seeslaveidemonstrateyetartsnomedievalsees"	0	0	
+   
+"eegiicgaeadbcfacfhifdbiehbgejcaeggcgbahfcajfhjjdgj"	42	42	
+   
+"kwtbjmsjvbrwriqwxadwnufplszhqccayvdhhvscxjaqsrmrrqngmuvxnugdzjfxeihogzsdjtvdmkudckjoggltcuybddbjoizu"	89	89	
+   
+"ltsqjodzeriqdtyewsrpfscozbyrpidadvsmlylqrviuqiynbscgmhulkvdzdicgdwvquigoepiwxjlydogpxdahyfhdnljshgjeprsvgctgnfgqtnfsqizonirdtcvblehcwbzedsmrxtjsipkyxk"	143	143	
+   
+"ababababababababababababcbabababababababababababa"	0	0	
+   
+"fifgbeajcacehiicccfecbfhhgfiiecdcjjffbghdidbhbdbfbfjccgbbdcjheccfbhafehieabbdfeigbiaggchaeghaijfbjhi"	75	75	
+   
+"apjesgpsxoeiokmqmfgvjslcjukbqxpsobyhjpbgdfruqdkeiszrlmtwgfxyfostpqczidfljwfbbrflkgdvtytbgqalguewnhvvmcgxboycffopmtmhtfizxkmeftcucxpobxmelmjtuzigsxnncxpaibgpuijwhankxbplpyejxmrrjgeoevqozwdtgospohznkoyzocjlracchjqnggbfeebmuvbicbvmpuleywrpzwsihivnrwtxcukwplgtobhgxukwrdlszfaiqxwjvrgxnsveedxseeyeykarqnjrtlaliyudpacctzizcftjlunlgnfwcqqxcqikocqffsjyurzwysfjmswvhbrmshjuzsgpwyubtfbnwajuvrfhlccvfwhxfqthkcwhatktymgxostjlztwdxritygbrbibdgkezvzajizxasjnrcjwzdfvdnwwqeyumkamhzoqhnqjfzwzbixclcxqrtniznemxeahfozp"	452	452	
+   
+"adabdcaebdcebdcacaaaadbbcadabcbeabaadcbcaaddebdbddcbdacdbbaedbdaaecabdceddccbdeeddccdaabbabbdedaaabcdadbdabeacbeadbaddcbaacdbabcccbaceedbcccedbeecbccaecadccbdbdccbcbaacccbddcccbaedbacdbcaccdcaadcbaebebcceabbdcdeaabdbabadeaaaaedbdbcebcbddebccacacddebecabccbbdcbecbaeedcdacdcbdbebbacddddaabaedabbaaabaddcdaadcccdeebcabacdadbaacdccbeceddeebbbdbaaaaabaeecccaebdeabddacbedededebdebabdbcbdcbadbeeceecdcdbbdcbdbeeebcdcabdeeacabdeaedebbcaacdadaecbccbededceceabdcabdeabbcdecdedadcaebaababeedcaacdbdacbccdbcece"	273	273	
+   
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"	1	1	
+   
+
+

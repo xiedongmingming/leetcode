@@ -1,0 +1,41 @@
+
+Implement int sqrt(int x).
+
+Compute and return the square root of x.
+
+public class Solution {
+    public int sqrt(int x) {
+        
+    }
+}
+
+package Level4;   
+/**  
+ * Sqrt(x)  
+ *   
+ * Implement int sqrt(int x).  
+ *   
+ * Compute and return the square root of x.  
+ *   
+ */
+public class S69{       
+	public static void main(String[] args){         
+		System.out.println(sqrt(2));     
+	}       
+	public static int sqrt(int x){         
+		double diff = 0.01;     //误差         
+		int low = 0;         
+		int high = x;                   
+		while(low <= high){             //注意越界所以用double来存             
+			double mid = low + (high - low) / 2;             
+			if(Math.abs(mid * mid - x) <= diff){                 
+				return (int)mid;             
+			}else if(x > mid * mid + diff){                 
+				low = (int)mid + 1;             
+			}else if(x < mid * mid - diff){                 
+				high = (int)mid - 1;             
+			}         
+		}                   //当找不到时候这是low,high指针已经交叉,取较小的即high         
+		return high;     
+	}   
+} 

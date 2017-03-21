@@ -1,0 +1,53 @@
+N-Queens
+
+The n-queens puzzle is the problem of placing n queens on an nxn chessboard such that no two queens attack each other. Given an integer n, return all distinct solutions to the n-queens puzzle. Each solution contains a distinct board configuration of the n-queens' placement, where 'Q' and '.' both indicate a queen and an empty space respectively.
+For example, There exist two distinct solutions to the 4-queens puzzle:
+[[".Q..", "...Q",  "Q...",  "..Q."], ["..Q.", "Q...",  "...Q",  ".Q.."]]
+public class Solution{
+    public List<String[]> solveNQueens(int n){
+        
+    }
+}
+
+public class Solution{
+    public ArrayList<String[]> solveNQueens(int n){
+        ArrayList<String[]> list = new ArrayList<String[]>();
+        int[] path = new int[n];//用于存放每一行皇后所在的列位置
+        dfs(list, path, n, 0);
+        return list;
+    }
+	//level表示当前将要放置皇后的行号
+    public void dfs(ArrayList<String[]> list, int[] path, int n, int level){
+        if(level == n){//表示已经遍历完了,将遍历得到的结果放入list中
+            String[] set = new String[n];
+            for(int i = 0; i < n; i++){//共n行
+                StringBuffer str = new StringBuffer();
+                for(int j = 0; j < n; j++){
+                    if(path[i] == j){
+						str.append("Q");
+					}else{
+						str.append(".");
+					}
+                }
+                set[i] = str.toString();
+            }
+            list.add(set);
+            return;
+        }
+        for(int i = 0; i < n; i++){//当前行的列遍历
+            path[level] = i;//
+            if(check(path, level)){
+				dfs(list, path, n, level + 1);
+			}
+        }
+    }
+    public boolean check(int[] path, int level){//用于判断第level行位置是否满足条件
+        for(int i = 0; i < level; i++){
+			//第一个表达式用于表示是否在同一列,第二个表达式表示是否在对角线上
+            if((path[i] == path[level]) || Math.abs(path[i] - path[level]) == (level - i)){
+				return false;
+			}
+        }
+        return true;
+    }
+}

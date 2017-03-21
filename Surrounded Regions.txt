@@ -1,0 +1,59 @@
+Surrounded Regions
+
+Given a 2D board containing 'X' and 'O', capture all regions surrounded by 'X'. A region is captured by flipping all 'O's into 'X's in that surrounded region. For example,
+X X X X
+X O O X
+X X O X
+X O X X
+After running your function, the board should be: 
+X X X X
+X X X X
+X X X X
+X O X X
+从四个边界的'O'出发,它们所能到达的'O'就是没有被包围的'O'.所以,该题可以用BFS遍历或者DFS遍历.Java代码提交时,大数据偶尔会不通过.
+
+public class Solution{
+    private int m, n;
+    private char[][] board;
+    private Queue<Integer> queue = new LinkedList<Integer>();
+    public void add(int x, int y){
+        if(x >= 0 && x < m && y >= 0 && y < n && board[x][y] == 'O'){
+            board[x][y] = 'Z';//标志矩阵
+            queue.offer(x * n + y);//添加位置
+        }
+    }
+    public void traversal(int x, int y){
+        add(x, y);//以当前的O节点为起始位置遍历
+        while(!queue.isEmpty()){
+            int p = queue.poll();
+            int px = p / n;
+            int py = p % n;
+			//将当前的位置的周围位置添加到队列中
+            add(px - 1, py);
+            add(px + 1, py);
+            add(px, py - 1);
+            add(px, py + 1);
+        }
+    }
+    public void solve(char[][] board){
+        if(board == null || board.length == 0 || board[0].length == 0){
+            return;
+        }
+        this.board = board;
+        m = board.length;//行
+        n = board[0].length;//列       
+        for(int i = 0; i < n; i++){
+            traversal(0, i);//扫描第0行
+            traversal(m - 1, i);//扫描最后一行     
+        }
+        for(int i = 0; i < m; i++){
+            traversal(i, 0);//扫描第一列
+            traversal(i, n - 1);//扫描最后一列
+        }
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                board[i][j] = board[i][j] == 'Z' ? 'O' : 'X';
+            }
+        }
+    }
+}

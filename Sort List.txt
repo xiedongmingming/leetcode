@@ -1,0 +1,79 @@
+Sort List
+
+Sort a linked list in O(nlogn) time using constant space complexity.
+
+/**
+ * Definition for singly-linked list.
+ * class ListNode{
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x){
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution{
+    public ListNode sortList(ListNode head){
+        
+    }
+}
+对一个链表进行排序,且时间复杂度要求为O(nlogn),空间复杂度为常量.一看到O(nlogn)的排序,首先应该想到归并排序和快速排序,但是通常我们使用这两种排序方法时都是针对数组的,现在是链表了.
+归并排序法:在动手之前一直觉得空间复杂度为常量不太可能,因为原来使用归并时,都是O(N)的,需要复制出相等的空间来进行赋值归并.对于链表,实际上是可以实现常数空间占用的.利用归并的思想,递归地将当前链表分为两段,然后merge,分两段的方法是使用fast-slow法,用两个指针,一个每次走两步,一个走一步,知道快的走到了末尾,然后慢的所在位置就是中间位置,这样就分成了两段.merge时,把两段头部节点值比较,用一个p指向较小的,且记录第一个节点,然后两段的头一步一步向后走,p也一直向后走,总是指向较小节点,直至其中一个头为NULL,处理剩下的元素.最后返回记录的头即可.代码如下:
+快速排序:使用快排也行,就是每次利用头节点作为基准,将小于它的交换到链表左侧,大于它的放在右侧,最后把它换到中间某个位置,然后递归处理左侧和右侧.但是相对于归并来说,它的元素交换次数太多了,可能会超时.
+
+解题报告:就是对一个链表进行归并排序.
+主要考察3个知识点,
+知识点1:归并排序的整体思想
+知识点2:找到一个链表的中间节点的方法
+知识点3:合并两个已排好序的链表为一个新的有序链表
+归并排序的基本思想是:找到链表的middle节点,然后递归对前半部分和后半部分分别进行归并排序,最后对两个以排好序的链表进行Merge.
+AC代码: https://github.com/tanglu/Leetcode/blob/master/sortList.java
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution{
+     //use the fast and slow pointer to get the middle of a ListNode
+     ListNode getMiddleOfList(ListNode head){//当有偶数个节点时(中间节点为靠前的一个)
+        ListNode slow = head;
+        ListNode fast = head;
+        while(fast.next != null && fast.next.next != null){
+        	slow = slow.next;
+        	fast = fast.next.next;
+        }
+        return slow;
+    }
+    public ListNode sortList(ListNode head){
+        if(head == null || head.next == null){
+            return head;
+        }
+    	ListNode middle = getMiddleOfList(head);
+    	ListNode next = middle.next;
+    	middle.next = null;//将链表拆成两半
+    	return mergeList(sortList(head), sortList(next));//递归调用
+    }
+    ListNode mergeList(ListNode a, ListNode b){//merge the two sorted list
+    	ListNode dummyHead = new ListNode(-1);
+    	ListNode curr = dummyHead;
+    	while(a != null && b != null){
+    		if(a.val <= b.val){
+    			curr.next = a;
+				a = a.next;
+    		}else{
+    			curr.next = b;
+				b = b.next;
+    		}
+    		curr = curr.next;
+    	}
+    	curr.next = a != null ? a : b;//当出现一个链表空时
+    	return dummyHead.next;
+    }
+}

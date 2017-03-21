@@ -1,0 +1,54 @@
+Search in Rotated Sorted Array II
+Follow up for "Search in Rotated Sorted Array":
+What if duplicates are allowed?
+
+Would this affect the run-time complexity? How and why?
+
+Write a function to determine if a given target is in the array.
+
+public class Solution {
+    public boolean search(int[] A, int target) {
+		 int pivot = 0;
+		 int n = A.length;
+		 int left = 0, right = n - 1;
+		 int mid = (left + right) / 2;
+		 //find pivot
+		 while (left <= right) {
+		     //check if current value equals to next one.
+		     if (left < n - 1 && A[left] == A[left + 1]) {
+				 ++left;
+				 continue;
+			 }
+			 mid = (left + right) / 2;
+			 if (A[left] >= A[mid])
+				 right = mid - 1;
+			 else 
+				 left = mid + 1;
+			 if (mid > 0 && A[mid] < A[mid - 1]) {
+	         	pivot = mid;
+	           	break;
+			 }
+	         if (mid < n - 1 && A[mid] > A[mid + 1]) {
+	         	pivot = mid + 1;
+	           	break;
+	         }
+	            	
+		 }
+		 left = 0;
+		 right = n - 1;
+		 //find target.
+		 while (left <= right) {
+			 mid = (left + right) / 2;
+			 int m = (mid + pivot) % n;
+			 if (target > A[m]) {
+				 left = mid + 1;
+			 }
+			 else if (target < A[m]) {
+				 right = mid - 1;
+			 }
+			 else
+				 return true;
+		 }
+		 return false;  
+    }
+}

@@ -1,0 +1,52 @@
+Restore IP Addresses
+
+Given a string containing only digits, restore it by returning all possible valid IP address combinations. For example: Given "25525511135", return ["255.255.11.135", "255.255.111.35"]. (Order does not matter) 
+public class Solution{    
+	public List<String> restoreIpAddresses(String s){
+	
+	}
+}
+判断符合条件的IP地址.每个IP地址是由4段数字组成的,这4段数字满足值在0到255,并且长度不为0,以0开头的都是不满足要求的,比如00,010都是错误数字.dfs求所有符合条件的地址,求解的过程中,注意每次截取数字是有限制的.
+int len = s.length();
+int min = Math.max(1, len - (3 - num) * 3);
+int max = Math.min(3, len - (3 - num));
+这三行代码的意思是:假如当前字符串的长度为len,并且已经组成了num段ip,那么
+1)、可以截取的最小长度是当前长度减去剩余需要组成的ip段长度*3和1的最大值.比如当前字符串长度为11,已组成0段,那么第一段的最小长度应该是
+int min = Math.max(1, 11 - (3 - 0) * 3);
+之所以这么做是因为,如果第1段长度为1,那么剩下的3段分10个数,必然有不合要求的. 
+2)、可以截取的最大长度是当前长度减去剩余需要组成ip段长度和3的最小值.比如当前字符串长度为11,已组成0段,那么第一段的最大长度应该是int max = Math.min(3, 11 - (3 - 0));
+之所以这么做是因为,如果第1段长度为8,比3个数多,不符合要求.其实这是个剪枝的过程.当然也可以直接从1到3去截取,肯定有不符合要求的,会浪费很多时间和空间.
+public class Solution{
+    public ArrayList<String> restoreIpAddresses(String s){
+		ArrayList<String> list = new ArrayList<String>();
+		dfs(list, s, new StringBuffer(), 0);
+		return list;
+	}
+	//
+	private void dfs(ArrayList<String> list, String s, StringBuffer sb, int num){
+		if(num == 4){//表示已经组成了4段
+			list.add(sb.toString());
+			return;
+		}
+		int len = s.length();
+		int min = Math.max(1, len - (3 - num) * 3);
+		int max = Math.min(3, len - (3 - num));
+		int end = min;
+		while(end >= min && end <= max){//循环遍历
+			String news = s.substring(0, end);//截取字符串
+			if(end != 1 && news.charAt(0) == '0'){//表示就一个数时可以为0(其他的则不能为0)
+			    break;
+			}
+			int tempNum = Integer.parseInt(news);//将截取的字符串转换为数字
+			if(tempNum >= 0 && tempNum < 256){
+				StringBuffer newsb = new StringBuffer(sb);//sb表示之前已经组成的段
+				if(!"".equals(newsb.toString())){//不是第一个段的时候才需要添加'.'
+					newsb.append(".");
+				}
+				newsb.append(news);//将新截取的字符串添加到已组成的字符串中
+				dfs(list, s.substring(end), newsb, num + 1);//递归调用
+			}
+			end++;
+		}
+	}
+}

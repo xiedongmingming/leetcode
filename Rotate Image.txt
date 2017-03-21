@@ -1,0 +1,54 @@
+Rotate Image
+
+
+You are given an n x n 2D matrix representing an image.
+
+Rotate the image by 90 degrees (clockwise).
+
+Follow up:
+Could you do this in-place?
+
+public class Solution {
+    public void rotate(int[][] matrix) {
+        
+    }
+}
+
+
+1.首先我要在纸上，非常非常聪明且迅速且机灵，
+2.给出几个用例，找出边界用例和特殊用例，确定特判条件；在编码前考虑到所有的条件
+3.向面试官提问：问题规模，特殊用例
+4.给出函数头
+5.暴力解，简述，优化。
+6.给出能够想到的最优价
+7.伪代码，同时结合用例
+8.真实代码
+Rotate Image
+You are given an n x n 2D matrix representing an image.
+
+Rotate the image by 90 degrees (clockwise).
+
+Follow up:
+Could you do this in-place?
+
+
+public class Solution {
+    public void rotate(int[][] matrix) {
+        int n = matrix.length;
+        int[][] rotatedMatrix = new int[n][n];
+        
+        // Construct rotated matrix
+        for (int i=0; i<n; i++){
+            for (int j=0; j<n; j++){
+                rotatedMatrix[j][n-1-i] = matrix[i][j];
+            }
+        }
+        
+        // Reformat override original matrix
+        for (int i=0; i<n; i++){
+            for (int j=0; j<n; j++){
+                matrix[i][j] = rotatedMatrix[i][j];
+            }
+        }        
+    }
+}
